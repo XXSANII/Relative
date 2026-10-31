@@ -11,6 +11,7 @@
 - `02-claim-function-patch.sql`: ฟังก์ชัน Claim Code ที่ตรวจชื่อด้วย
 - `04-relation-names.sql`: เก็บชื่อพ่อ/แม่/คู่สมรส และเชื่อมเป็นลิงก์อัตโนมัติเมื่อบุคคลนั้นลงทะเบียน
 - `05-address-fields.sql`: คอลัมน์ที่อยู่แบบแยกส่วน (บ้านเลขที่ ถนน ตำบล อำเภอ จังหวัด รหัสไปรษณีย์)
+- `06-storage-avatar-policies.sql`: สิทธิ์อัปโหลด/แก้/ลบรูปโปรไฟล์ใน bucket `family-avatars` (เฉพาะรูปของตัวเอง)
 - `address.js`, `th-address.json`: ตัวเลือกที่อยู่ไทย (77 จังหวัด 930 อำเภอ/เขต 7,436 ตำบล/แขวง พร้อมรหัสไปรษณีย์) ย่อจาก github.com/kongvut/thai-province-data
 
 ## ขั้นตอนติดตั้ง
@@ -19,10 +20,11 @@
 3. รัน `02-claim-function-patch.sql` ใน Supabase SQL Editor เพื่อสร้างฟังก์ชัน `claim_existing_person_by_name(text,text)` ซึ่งหน้า Register เรียกใช้
 4. รัน `04-relation-names.sql` (ต้องรันก่อน deploy หน้าเว็บเวอร์ชันนี้ เพราะหน้าเว็บบันทึกคอลัมน์ `father_name`, `mother_name`, `spouse_name`)
 5. รัน `05-address-fields.sql` (ต้องรันก่อน deploy หน้าเว็บเวอร์ชันนี้)
-6. ตรวจว่า RLS บน `person` มี SELECT สำหรับ authenticated และ INSERT/UPDATE/DELETE เฉพาะ `auth_user_id = auth.uid()` เท่านั้น และไม่มี policy anon แบบเปิดกว้างหลงเหลือ
-7. ใน Supabase Auth หากใช้ username ที่แปลงเป็นอีเมลภายใน ให้ปิด Confirm email สำหรับเดโมนี้ มิฉะนั้นต้องทำ flow ยืนยันบัญชีให้ครบก่อนเชื่อมข้อมูล
-8. ตั้ง Storage bucket `family-avatars` เป็น public เพื่อให้ `getPublicUrl()` ใช้ได้ หรือปรับโค้ดเป็น signed URLs และกำหนด Storage policies ให้ปลอดภัย
-9. เปิดผ่าน VS Code Live Server หรือเว็บเซิร์ฟเวอร์ ไม่แนะนำ `file://`
+6. รัน `06-storage-avatar-policies.sql` (ถ้าไม่รัน การแนบรูปจะขึ้น row-level security error)
+7. ตรวจว่า RLS บน `person` มี SELECT สำหรับ authenticated และ INSERT/UPDATE/DELETE เฉพาะ `auth_user_id = auth.uid()` เท่านั้น และไม่มี policy anon แบบเปิดกว้างหลงเหลือ
+8. ใน Supabase Auth หากใช้ username ที่แปลงเป็นอีเมลภายใน ให้ปิด Confirm email สำหรับเดโมนี้ มิฉะนั้นต้องทำ flow ยืนยันบัญชีให้ครบก่อนเชื่อมข้อมูล
+9. ตั้ง Storage bucket `family-avatars` เป็น public เพื่อให้ `getPublicUrl()` ใช้ได้ หรือปรับโค้ดเป็น signed URLs และกำหนด Storage policies ให้ปลอดภัย
+10. เปิดผ่าน VS Code Live Server หรือเว็บเซิร์ฟเวอร์ ไม่แนะนำ `file://`
 
 ## การเชื่อมบุคคลเดิม
 ผู้ดูแลสร้าง Claim Code สำหรับ `person.id` ที่ยืนยันตัวบุคคลแล้ว และส่งให้เจ้าตัวผ่านช่องทางที่เชื่อถือได้ รหัสมีอายุจำกัดและใช้ได้ครั้งเดียว อย่าออก Claim Code โดยอาศัยชื่ออย่างเดียว
