@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ทะเบียนเครือญาติ</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<h1>ทะเบียนเครือญาติ <span class="muted" style="font-size:.8rem">(Demo)</span></h1>
+
+<!-- ตั้งค่า -->
+<div class="card" id="setup" style="display:none">
+  <h2>ยังไม่ได้ตั้งค่า Supabase</h2>
+  <p>เปิดไฟล์นี้แล้วแก้ <code>SUPABASE_URL</code> และ <code>SUPABASE_ANON_KEY</code> ที่ต้นสคริปต์
+  (หาได้ที่ Supabase &gt; Project Settings &gt; API)</p>
+</div>
+
+<!-- เข้าสู่ระบบ -->
+<div class="card" id="auth" style="display:none">
+  <h2>เข้าสู่ระบบ</h2>
+  <label>อีเมล</label><input id="email" type="email" autocomplete="username">
+  <label>รหัสผ่าน (อย่างน้อย 6 ตัว)</label><input id="pass" type="password" autocomplete="current-password">
+  <div class="two">
+    <button id="login">เข้าสู่ระบบ</button>
+    <button id="signup" class="ghost">สมัครสมาชิก</button>
+  </div>
+</div>
+
+<div id="app" style="display:none">
+  <p class="muted" style="font-size:.85rem">เวอร์ชันทดลอง: ข้อมูลเก็บในฐานข้อมูลจริง ลองเพิ่ม/ลบได้เลย ไม่ต้อง login</p>
+
+  <div class="card">
+    <h2>ลงทะเบียนบุคคล</h2>
+    <label>ชื่อ-นามสกุล</label>
+    <input id="name" placeholder="เช่น สมชาย ใจดี">
+    <label>ชื่อพ่อ (ไม่บังคับ)</label>
+    <input id="father" list="people-list" placeholder="พิมพ์ชื่อพ่อ" autocomplete="off">
+    <label>ชื่อแม่ (ไม่บังคับ)</label>
+    <input id="mother" list="people-list" placeholder="พิมพ์ชื่อแม่" autocomplete="off">
+    <datalist id="people-list"></datalist>
+    <p class="muted" style="font-size:.8rem;margin:6px 0 0">พิมพ์ชื่อได้เลย ถ้าชื่อตรงกับคนที่มีอยู่แล้วจะเชื่อมกับคนเดิมให้อัตโนมัติ ถ้าไม่มีจะสร้างคนใหม่</p>
+    <button id="save">บันทึก</button>
+  </div>
+
+  <div class="card" id="profile" style="display:none">
+    <div class="crumbs" id="crumbs"></div>
+    <h2 id="pname"></h2>
+    <div class="row"><span>พ่อ</span><span id="pf"></span></div>
+    <div class="row"><span>แม่</span><span id="pm"></span></div>
+    <p class="muted" style="font-size:.85rem">คลิกชื่อพ่อ/แม่ เพื่อดูข้อมูลของท่าน เช่น พ่อของพ่อ = ปู่</p>
+    <button class="ghost" id="back">ย้อนกลับ</button>
+    <button class="del" id="delCur" style="margin-top:8px">ลบคนนี้</button>
+  </div>
+
+  <div class="card">
+    <h2>รายชื่อทั้งหมด <span class="muted" id="count"></span></h2>
+    <div id="list"></div>
+  </div>
+</div>
+
+<div id="modal"><div class="box">
+  <p id="mmsg"></p><div id="mbody"></div>
+  <div id="mbtns"><button class="ghost" id="mcancel">ยกเลิก</button><button id="mok">ตกลง</button></div>
+</div></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
