@@ -1,0 +1,33 @@
+# ===== ความลับ: ห้ามขึ้น git เด็ดขาด =====
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets/
+# (Supabase secret key / service_role key / database password ห้ามใส่ในโปรเจกต์นี้)
+
+# ===== Dependencies / build =====
+node_modules/
+dist/
+build/
+.cache/
+
+# ===== Logs =====
+*.log
+npm-debug.log*
+
+# ===== OS =====
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ===== Editor =====
+.vscode/
+.idea/
+*.swp
+*~
+
+# ===== Supabase CLI (ถ้าใช้ในอนาคต) =====
+supabase/.branches/
+supabase/.temp/
