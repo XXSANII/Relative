@@ -1,6 +1,7 @@
 (async()=>{
   const {data:{session}}=await sb.auth.getSession();
   if(session){location.href='main.html';return;}
+  const addrPicker=await initAddressPicker('','addressBox').catch(e=>{showMessage('message',e.message);return null;});
 
   $('avatar').addEventListener('change',()=>{
     const f=$('avatar').files[0];
@@ -33,7 +34,8 @@
       const name=`${firstName} ${lastName}`;
       const phone=normalizePhone($('phone').value);
       const gender=$('gender').value||null;
-      const address=$('address').value.trim()||null;
+      const addr=addrPicker?addrPicker.get():{values:{}};
+      if(addr.error){$(addr.focus).focus();throw new Error(addr.error);}
       const claimCode=$('claimCode').value.trim();
       if(firstName.length<2||/\s/.test(firstName)) throw new Error('กรุณากรอกชื่อจริงเป็นคำเดียว (ไม่ต้องใส่นามสกุล)');
       if(lastName.length<2) throw new Error('กรุณากรอกนามสกุลให้ถูกต้อง');
@@ -77,7 +79,7 @@
         // No existing person with this normalized name: create a new record for this account.
         // เก็บชื่อพ่อแม่เป็นข้อความ ฐานข้อมูลจะเชื่อมเป็นลิงก์ให้เมื่อบุคคลนั้นมีในระบบ (04-relation-names.sql)
         const father_name=$('father').value.trim()||null,mother_name=$('mother').value.trim()||null;
-        const {data:person,error:personError}=await sb.from('person').insert({full_name:name,phone,gender,address,father_name,mother_name,auth_user_id:authData.user.id}).select('id').single();
+        const {data:person,error:personError}=await sb.from('person').insert({full_name:name,phone,gender,...addr.values,father_name,mother_name,auth_user_id:authData.user.id}).select('id').single();
         if(personError) throw personError;
         personId=person.id;
       }
