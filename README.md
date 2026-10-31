@@ -9,15 +9,17 @@
 - `common.js`: ฟังก์ชันร่วม
 - `config.js`: Supabase URL และ publishable/anon key
 - `02-claim-function-patch.sql`: ฟังก์ชัน Claim Code ที่ตรวจชื่อด้วย
+- `04-relation-names.sql`: เก็บชื่อพ่อ/แม่/คู่สมรส และเชื่อมเป็นลิงก์อัตโนมัติเมื่อบุคคลนั้นลงทะเบียน
 
 ## ขั้นตอนติดตั้ง
 1. เปิด `config.js` ตรวจสอบ Supabase URL และ publishable/anon key ให้เป็นของโปรเจกต์คุณ
 2. ตรวจว่าได้สร้าง `person_claim_codes` และ `claim_existing_person(text)` ตาม SQL ที่ทำไว้ก่อนหน้าแล้ว
 3. รัน `02-claim-function-patch.sql` ใน Supabase SQL Editor เพื่อสร้างฟังก์ชัน `claim_existing_person_by_name(text,text)` ซึ่งหน้า Register เรียกใช้
-4. ตรวจว่า RLS บน `person` มี SELECT สำหรับ authenticated และ INSERT/UPDATE/DELETE เฉพาะ `auth_user_id = auth.uid()` เท่านั้น และไม่มี policy anon แบบเปิดกว้างหลงเหลือ
-5. ใน Supabase Auth หากใช้ username ที่แปลงเป็นอีเมลภายใน ให้ปิด Confirm email สำหรับเดโมนี้ มิฉะนั้นต้องทำ flow ยืนยันบัญชีให้ครบก่อนเชื่อมข้อมูล
-6. ตั้ง Storage bucket `family-avatars` เป็น public เพื่อให้ `getPublicUrl()` ใช้ได้ หรือปรับโค้ดเป็น signed URLs และกำหนด Storage policies ให้ปลอดภัย
-7. เปิดผ่าน VS Code Live Server หรือเว็บเซิร์ฟเวอร์ ไม่แนะนำ `file://`
+4. รัน `04-relation-names.sql` (ต้องรันก่อน deploy หน้าเว็บเวอร์ชันนี้ เพราะหน้าเว็บบันทึกคอลัมน์ `father_name`, `mother_name`, `spouse_name`)
+5. ตรวจว่า RLS บน `person` มี SELECT สำหรับ authenticated และ INSERT/UPDATE/DELETE เฉพาะ `auth_user_id = auth.uid()` เท่านั้น และไม่มี policy anon แบบเปิดกว้างหลงเหลือ
+6. ใน Supabase Auth หากใช้ username ที่แปลงเป็นอีเมลภายใน ให้ปิด Confirm email สำหรับเดโมนี้ มิฉะนั้นต้องทำ flow ยืนยันบัญชีให้ครบก่อนเชื่อมข้อมูล
+7. ตั้ง Storage bucket `family-avatars` เป็น public เพื่อให้ `getPublicUrl()` ใช้ได้ หรือปรับโค้ดเป็น signed URLs และกำหนด Storage policies ให้ปลอดภัย
+8. เปิดผ่าน VS Code Live Server หรือเว็บเซิร์ฟเวอร์ ไม่แนะนำ `file://`
 
 ## การเชื่อมบุคคลเดิม
 ผู้ดูแลสร้าง Claim Code สำหรับ `person.id` ที่ยืนยันตัวบุคคลแล้ว และส่งให้เจ้าตัวผ่านช่องทางที่เชื่อถือได้ รหัสมีอายุจำกัดและใช้ได้ครั้งเดียว อย่าออก Claim Code โดยอาศัยชื่ออย่างเดียว

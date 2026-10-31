@@ -2,11 +2,6 @@
   const {data:{session}}=await sb.auth.getSession();
   if(session){location.href='main.html';return;}
 
-  try {
-    const {data,error}=await sb.from('person').select('full_name').order('full_name');
-    if(!error) $('peopleList').innerHTML=(data||[]).map(p=>`<option value="${esc(p.full_name)}"></option>`).join('');
-  } catch (_) {}
-
   $('avatar').addEventListener('change',()=>{
     const f=$('avatar').files[0];
     if(!f){$('preview').hidden=true;return;}
@@ -73,15 +68,9 @@
         personId=data;
       } else {
         // No existing person with this normalized name: create a new record for this account.
-        let fatherId=null,motherId=null;
-        for(const key of ['father','mother']) {
-          const relationName=$(key).value.trim();if(!relationName)continue;
-          const {data:rel,error:relError}=await sb.from('person').select('id,full_name').ilike('full_name',relationName).limit(2);
-          if(relError) throw relError;
-          const exactRel=(rel||[]).filter(p=>normalize(p.full_name)===normalize(relationName));
-          if(exactRel.length===1) {if(key==='father')fatherId=exactRel[0].id;else motherId=exactRel[0].id;}
-        }
-        const {data:person,error:personError}=await sb.from('person').insert({full_name:name,phone,gender,address,father_id:fatherId,mother_id:motherId,auth_user_id:authData.user.id}).select('id').single();
+        // เก็บชื่อพ่อแม่เป็นข้อความ ฐานข้อมูลจะเชื่อมเป็นลิงก์ให้เมื่อบุคคลนั้นมีในระบบ (04-relation-names.sql)
+        const father_name=$('father').value.trim()||null,mother_name=$('mother').value.trim()||null;
+        const {data:person,error:personError}=await sb.from('person').insert({full_name:name,phone,gender,address,father_name,mother_name,auth_user_id:authData.user.id}).select('id').single();
         if(personError) throw personError;
         personId=person.id;
       }
