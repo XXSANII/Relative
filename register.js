@@ -41,8 +41,15 @@
 
       // Username (ชื่อจริง) + เบอร์โทร ถูกแปลงเป็นอีเมลภายในสำหรับ Supabase Auth
       const email=await accountEmail(firstName,phone);
-      const {data:authData,error:authError}=await sb.auth.signUp({email,password:phone,options:{data:{username:firstName,first_name:firstName,last_name:lastName}}});
-      if(authError) throw /already registered/i.test(authError.message)?new Error('ชื่อจริงและเบอร์โทรนี้มีบัญชีอยู่แล้ว กรุณาไปหน้าเข้าสู่ระบบ'):authError;
+      let {data:authData,error:authError}=await sb.auth.signUp({email,password:phone,options:{data:{username:firstName,first_name:firstName,last_name:lastName}}});
+      if(authError&&/already registered/i.test(authError.message)){
+        // มีบัญชีใน Auth อยู่แล้ว (เช่น ลบแถวใน person แต่ไม่ได้ลบผู้ใช้ใน Auth) → ลองเข้าสู่ระบบด้วยชื่อจริง+เบอร์เดียวกัน
+        const {data:signIn,error:signInError}=await sb.auth.signInWithPassword({email,password:phone});
+        if(signInError||!signIn.session) throw new Error('ชื่อจริงและเบอร์โทรนี้มีบัญชีอยู่แล้ว กรุณาไปหน้าเข้าสู่ระบบ');
+        if(await currentPerson()){await sb.auth.signOut();throw new Error('ชื่อจริงและเบอร์โทรนี้มีบัญชีอยู่แล้ว กรุณาไปหน้าเข้าสู่ระบบ');}
+        authData=signIn;authError=null;   // บัญชีค้างที่ไม่มีข้อมูลบุคคล → สร้างข้อมูลบุคคลต่อบนบัญชีเดิม
+      }
+      if(authError) throw authError;
       if(!authData.user) throw new Error('สร้างบัญชีไม่สำเร็จ');
       createdAuth=true;
       if(!authData.session) throw new Error('บัญชีถูกสร้างแล้ว แต่ยังไม่มี session กรุณาปิด Confirm email ใน Supabase Auth หรือใช้ flow ยืนยันบัญชีที่ตั้งค่าไว้');
