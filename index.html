@@ -32,20 +32,41 @@
 
   <div class="card">
     <h2>ลงทะเบียนบุคคล</h2>
-    <label>ชื่อ-นามสกุล</label>
+    <label>ชื่อ-นามสกุล <span class="req">*</span></label>
     <input id="name" placeholder="เช่น สมชาย ใจดี">
-    <label>ชื่อพ่อ (ไม่บังคับ)</label>
-    <input id="father" list="people-list" placeholder="พิมพ์ชื่อพ่อ" autocomplete="off">
-    <label>ชื่อแม่ (ไม่บังคับ)</label>
-    <input id="mother" list="people-list" placeholder="พิมพ์ชื่อแม่" autocomplete="off">
+
+    <label>เพศ</label>
+    <select id="gender">
+      <option value="">ไม่ระบุ</option>
+      <option value="male">ชาย</option>
+      <option value="female">หญิง</option>
+      <option value="other">อื่น ๆ</option>
+    </select>
+
+    <label>เบอร์โทร</label>
+    <input id="phone" type="tel" placeholder="เช่น 081-234-5678" autocomplete="off">
+
+    <label>ที่อยู่</label>
+    <textarea id="address" rows="2" placeholder="บ้านเลขที่ ถนน ตำบล อำเภอ จังหวัด"></textarea>
+
+    <label>ชื่อพ่อ <span class="req">*</span></label>
+    <input id="father" list="people-list" placeholder="พิมพ์ชื่อพ่อ (ต้องกรอก)" autocomplete="off">
+    <label>ชื่อแม่ <span class="req">*</span></label>
+    <input id="mother" list="people-list" placeholder="พิมพ์ชื่อแม่ (ต้องกรอก)" autocomplete="off">
+    <label>ชื่อคู่สมรส (ถ้ามี)</label>
+    <input id="spouse" list="people-list" placeholder="พิมพ์ชื่อคู่สมรส" autocomplete="off">
     <datalist id="people-list"></datalist>
-    <p class="muted" style="font-size:.8rem;margin:6px 0 0">พิมพ์ชื่อได้เลย ถ้าชื่อตรงกับคนที่มีอยู่แล้วจะเชื่อมกับคนเดิมให้อัตโนมัติ ถ้าไม่มีจะสร้างคนใหม่</p>
+    <p class="muted" style="font-size:.8rem;margin:6px 0 0">ช่องที่มี <span class="req">*</span> ต้องกรอก พิมพ์ชื่อพ่อ/แม่/คู่สมรสได้เลย ถ้าชื่อตรงกับคนที่มีอยู่แล้วจะเชื่อมกับคนเดิมให้อัตโนมัติ ถ้าไม่มีจะสร้างคนใหม่</p>
     <button id="save">บันทึก</button>
   </div>
 
   <div class="card" id="profile" style="display:none">
     <div class="crumbs" id="crumbs"></div>
     <h2 id="pname"></h2>
+    <div class="row"><span>เพศ</span><span id="pg"></span></div>
+    <div class="row"><span>เบอร์โทร</span><span id="pph"></span></div>
+    <div class="row"><span>ที่อยู่</span><span id="pad"></span></div>
+    <div class="row"><span>คู่สมรส</span><span id="psp"></span></div>
     <div class="row"><span>พ่อ</span><span id="pf"></span></div>
     <div class="row"><span>แม่</span><span id="pm"></span></div>
     <p class="muted" style="font-size:.85rem">คลิกชื่อพ่อ/แม่ เพื่อดูข้อมูลของท่าน เช่น พ่อของพ่อ = ปู่</p>

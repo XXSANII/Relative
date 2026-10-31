@@ -1,10 +1,13 @@
 const $=id=>document.getElementById(id);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const norm=s=>s.trim().replace(/\s+/g," ").toLowerCase();
-const NEW="__new__";
+const GENDER={male:"ชาย",female:"หญิง",other:"อื่น ๆ"};
+// ชื่อฟิลด์ในหน้าเว็บ -> ชื่อคอลัมน์ในฐานข้อมูล
+const COL={fatherId:"father_id",motherId:"mother_id",gender:"gender",phone:"phone",address:"address",spouseId:"spouse_id"};
 let sb=null,people=[],trail=[];
 const byId=id=>people.find(p=>p.id===id);
-const mapRow=r=>({id:r.id,name:r.full_name,fatherId:r.father_id,motherId:r.mother_id});
+const mapRow=r=>({id:r.id,name:r.full_name,fatherId:r.father_id,motherId:r.mother_id,
+  gender:r.gender,phone:r.phone,address:r.address,spouseId:r.spouse_id});
 
 /* ---- กล่องโต้ตอบในหน้า ---- */
 function ask({msg,input=false,def="",choices=null,okText="ตกลง",cancel=true}){
@@ -29,84 +32,120 @@ const guard=fn=>async(...a)=>{try{return await fn(...a)}catch(e){await notify("�
 
 /* ---- ชั้นข้อมูล (Supabase) ---- */
 async function loadPeople(){
-  const {data,error}=await sb.from("person").select("id,full_name,father_id,mother_id").order("full_name");
+  const {data,error}=await sb.from("person")
+    .select("id,full_name,father_id,mother_id,gender,phone,address,spouse_id").order("full_name");
   if(error)throw error;
   people=data.map(mapRow);
 }
-async function addPerson(name,fatherId=null,motherId=null){
-  const {data,error}=await sb.from("person")
-    .insert({full_name:name.trim(),father_id:fatherId,mother_id:motherId}).select().single();
+async function addPerson(name,fatherId=null,motherId=null,extra={}){
+  const row={full_name:name.trim(),father_id:fatherId,mother_id:motherId};
+  for(const k in extra)if(extra[k]!=null)row[COL[k]]=extra[k];
+  const {data,error}=await sb.from("person").insert(row).select().single();
   if(error)throw error;
   const p=mapRow(data);people.push(p);return p;
 }
-async function updateParents(id,patch){
+async function updatePerson(id,patch){
   const row={};
-  if("fatherId"in patch)row.father_id=patch.fatherId;
-  if("motherId"in patch)row.mother_id=patch.motherId;
+  for(const k in patch)row[COL[k]]=patch[k];
   const {error}=await sb.from("person").update(row).eq("id",id);
   if(error)throw error;
   Object.assign(byId(id),patch);
 }
 async function removePerson(id){
-  const {error}=await sb.from("person").delete().eq("id",id); // ลูกจะถูกตั้ง father_id/mother_id = null อัตโนมัติ
+  // ลูก/คู่สมรสที่ลิงก์อยู่ จะถูกตั้งค่าเป็น null อัตโนมัติ (on delete set null)
+  const {error}=await sb.from("person").delete().eq("id",id);
   if(error)throw error;
   people=people.filter(x=>x.id!==id);
-  people.forEach(x=>{if(x.fatherId===id)x.fatherId=null;if(x.motherId===id)x.motherId=null});
+  people.forEach(x=>{
+    if(x.fatherId===id)x.fatherId=null;
+    if(x.motherId===id)x.motherId=null;
+    if(x.spouseId===id)x.spouseId=null;
+  });
 }
 
 /* ---- ตรรกะหน้าจอ ---- */
-async function getOrCreate(name){
+// ชื่อซ้ำ -> ใช้คนเดิม (หลายคนให้เลือก) ; ไม่มี -> สร้างใหม่ ; ยกเลิก -> คืน null
+async function getOrCreate(name,gender=null){
   const m=people.filter(p=>norm(p.name)===norm(name));
-  if(!m.length)return addPerson(name);
+  if(!m.length)return addPerson(name,null,null,{gender});
   if(m.length===1)return m[0];
   const choices=m.map(p=>({value:String(p.id),
     label:`${p.name} (พ่อ: ${p.fatherId?byId(p.fatherId).name:"-"}, แม่: ${p.motherId?byId(p.motherId).name:"-"})`}));
   choices.push({value:"new",label:"สร้างเป็นคนใหม่"});
   const v=await ask({msg:`มีชื่อ "${name}" หลายคน เลือกคนที่ต้องการ`,choices});
   if(v===null)return null;
-  return v==="new"?addPerson(name):byId(Number(v));
+  return v==="new"?addPerson(name,null,null,{gender}):byId(Number(v));
 }
-// ช่องพ่อ/แม่เป็นช่องพิมพ์ชื่อ: ว่าง -> ไม่ระบุ, ชื่อตรงคนเดิม -> ลิงก์คนเดิม, ไม่มี -> สร้างใหม่
-async function resolveName(inputId){
+// ช่องพ่อ/แม่: ชื่อตรงคนเดิม -> ลิงก์คนเดิม, ไม่มี -> สร้างใหม่ (ตั้งเพศให้อัตโนมัติ)
+async function resolveName(inputId,gender){
   const n=$(inputId).value.trim();
   if(!n)return{id:null};
-  const p=await getOrCreate(n);
+  const p=await getOrCreate(n,gender);
   return p?{id:p.id}:{cancel:true};
 }
 function refreshForm(){
   // รายชื่อที่มีอยู่ ใช้เป็นคำแนะนำตอนพิมพ์ (datalist)
   $("people-list").innerHTML=people.map(p=>`<option value="${esc(p.name)}"></option>`).join("");
 }
+function clearForm(){
+  ["name","phone","address","father","mother","spouse"].forEach(id=>$(id).value="");
+  $("gender").value="";
+}
 
 $("save").onclick=guard(async()=>{
   const name=$("name").value.trim();
-  if(!name)return notify("กรุณาใส่ชื่อ");
-  const fName=$("father").value.trim(),mName=$("mother").value.trim();
-  // ตรวจก่อนสร้างข้อมูลใดๆ
-  if(fName&&norm(fName)===norm(name)||mName&&norm(mName)===norm(name))
-    return notify("พ่อ/แม่ต้องไม่ใช่คนเดียวกับตัวเอง");
-  if(fName&&mName&&norm(fName)===norm(mName))
-    return notify("พ่อและแม่ต้องเป็นคนละคน");
+  if(!name)return notify("กรุณาใส่ชื่อ-นามสกุล");
+  const fName=$("father").value.trim(),mName=$("mother").value.trim(),sName=$("spouse").value.trim();
+  const gender=$("gender").value||null;
+  const phone=$("phone").value.trim()||null;
+  const address=$("address").value.trim()||null;
+  const existing=people.find(x=>norm(x.name)===norm(name));
+
+  // ---- ตรวจข้อมูลก่อนสร้างข้อมูลใดๆ ----
+  if(!existing){
+    // คนใหม่ ต้องกรอกชื่อพ่อและแม่ ไม่เช่นนั้นเพิ่มไม่ได้
+    if(!fName){$("father").focus();return notify("ต้องกรอก \"ชื่อพ่อ\" ก่อน จึงจะเพิ่มได้")}
+    if(!mName){$("mother").focus();return notify("ต้องกรอก \"ชื่อแม่\" ก่อน จึงจะเพิ่มได้")}
+  }
+  if(phone&&!/^[0-9+\-\s()]{8,20}$/.test(phone)){$("phone").focus();return notify("เบอร์โทรไม่ถูกต้อง (ใช้ตัวเลข เว้นวรรค - + ( ) ได้ 8-20 ตัว)")}
+  if([fName,mName].some(x=>x&&norm(x)===norm(name)))return notify("พ่อ/แม่ต้องไม่ใช่คนเดียวกับตัวเอง");
+  if(sName&&norm(sName)===norm(name))return notify("คู่สมรสต้องไม่ใช่คนเดียวกับตัวเอง");
+  if(fName&&mName&&norm(fName)===norm(mName))return notify("พ่อและแม่ต้องเป็นคนละคน");
+  if(sName&&[fName,mName].some(x=>x&&norm(x)===norm(sName)))return notify("คู่สมรสต้องไม่ใช่พ่อหรือแม่ของตัวเอง");
+
   $("save").disabled=true;
   try{
-    const rf=await resolveName("father");if(rf.cancel)return;
-    const rm=await resolveName("mother");if(rm.cancel)return;
+    // คู่สมรส (ถ้ามี)
+    let s=null;
+    if(sName){
+      s=await getOrCreate(sName);if(!s)return;
+      if(s.spouseId&&(!existing||s.spouseId!==existing.id))
+        return notify(`"${s.name}" มีคู่สมรสเป็นคนอื่นอยู่แล้ว`);
+    }
+    const rf=await resolveName("father","male");if(rf.cancel)return;
+    const rm=await resolveName("mother","female");if(rm.cancel)return;
     const f=rf.id,m=rm.id;
-    let p=people.find(x=>norm(x.name)===norm(name));
+
+    let p=existing;
     if(p){
-      if(p.id===f||p.id===m)return notify("พ่อ/แม่ต้องไม่ใช่คนเดียวกับตัวเอง");
-      const ok=await ask({msg:`มี "${p.name}" อยู่ในระบบแล้ว ต้องการเติมข้อมูลให้คนเดิมใช่ไหม?\n(เติมเฉพาะช่องพ่อ/แม่ที่ยังว่าง)`,okText:"เติมข้อมูล"});
+      if(p.id===f||p.id===m||(s&&s.id===p.id))return notify("ข้อมูลพ่อ/แม่/คู่สมรสซ้ำกับตัวเอง");
+      const ok=await ask({msg:`มี "${p.name}" อยู่ในระบบแล้ว ต้องการเติมข้อมูลให้คนเดิมใช่ไหม?\n(เติมเฉพาะช่องที่ยังว่าง ไม่ทับข้อมูลเดิม)`,okText:"เติมข้อมูล"});
       if(!ok)return;
       const patch={};
       if(f&&!p.fatherId)patch.fatherId=f;
       if(m&&!p.motherId)patch.motherId=m;
-      if(Object.keys(patch).length)await updateParents(p.id,patch);
+      if(gender&&!p.gender)patch.gender=gender;
+      if(phone&&!p.phone)patch.phone=phone;
+      if(address&&!p.address)patch.address=address;
+      if(s&&!p.spouseId)patch.spouseId=s.id;
+      if(Object.keys(patch).length)await updatePerson(p.id,patch);
     }else{
-      if(f&&f===m)return notify("พ่อและแม่ต้องเป็นคนละคน");
-      p=await addPerson(name,f,m);
+      p=await addPerson(name,f,m,{gender,phone,address,spouseId:s?s.id:null});
     }
-    $("name").value=$("father").value=$("mother").value="";
-    refreshForm();renderList();show(p.id,true);
+    // ผูกคู่สมรสให้ครบสองฝั่ง
+    if(s&&p.spouseId===s.id&&s.spouseId!==p.id)await updatePerson(s.id,{spouseId:p.id});
+
+    clearForm();refreshForm();renderList();show(p.id,true);
   }finally{$("save").disabled=false}
 });
 
@@ -118,9 +157,9 @@ function parentCell(p,key,label){
 const addParent=guard(async(id,key,label)=>{
   const n=await ask({msg:"ชื่อ"+label,input:true});
   if(!n||!n.trim())return;
-  const par=await getOrCreate(n);if(!par)return;
+  const par=await getOrCreate(n,key==="fatherId"?"male":"female");if(!par)return;
   if(par.id===id)return notify("พ่อ/แม่ต้องไม่ใช่คนเดียวกับตัวเอง");
-  await updateParents(id,{[key]:par.id});
+  await updatePerson(id,{[key]:par.id});
   refreshForm();renderList();show(id,false,true);
 });
 function show(id,reset=false,keep=false){
@@ -129,6 +168,11 @@ function show(id,reset=false,keep=false){
   const p=byId(id);if(!p)return;
   $("profile").style.display="block";
   $("pname").textContent=p.name;
+  $("pg").textContent=p.gender?GENDER[p.gender]:"ไม่ระบุ";
+  $("pph").textContent=p.phone||"-";
+  $("pad").textContent=p.address||"-";
+  const sp=p.spouseId?byId(p.spouseId):null;
+  $("psp").innerHTML=sp?`<button class="link" onclick="show(${sp.id})">${esc(sp.name)}</button>`:'<span class="muted">ไม่มี</span>';
   $("pf").innerHTML=parentCell(p,"fatherId","พ่อ");
   $("pm").innerHTML=parentCell(p,"motherId","แม่");
   $("crumbs").innerHTML=trail.map(t=>byId(t)?esc(byId(t).name):"").join(" › ");
@@ -151,7 +195,7 @@ function renderList(){
   $("count").textContent=`(${people.length} คน)`;
   $("list").innerHTML=people.length?people.map(p=>
     `<div class="row"><button class="link" onclick="show(${p.id},true)">${esc(p.name)}</button><button class="del" onclick="deletePerson(${p.id})">ลบ</button></div>`).join("")
-    :'<span class="muted">ยังไม่มีข้อมูล เริ่มลงทะเบียนคนแรกได้เลย</span>';
+    :'<span class="muted">ยังไม่มีข้อมูล</span>';
 }
 
 /* ---- เริ่มแอป (เวอร์ชัน demo: ไม่ต้อง login) ---- */
