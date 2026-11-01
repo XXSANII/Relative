@@ -2,18 +2,20 @@
 
 ## โครงสร้างโฟลเดอร์
 ```
-├── index.html, register.html, login.html, main.html, profile.html   หน้าเว็บ (อยู่ชั้นนอกสุดเพื่อให้ URL เดิมใช้ได้)
+├── index.html, register.html, login.html, main.html, profile.html, tree.html   หน้าเว็บ (อยู่ชั้นนอกสุดเพื่อให้ URL เดิมใช้ได้)
 ├── css/style.css            ธีมสีและสไตล์ทั้งหมด
 ├── js/
 │   ├── config.js            Supabase URL และ publishable/anon key
 │   ├── shared/              โค้ดที่หลายหน้าใช้ร่วมกัน
 │   │   ├── common.js        ฟังก์ชันร่วม, Supabase client, อีเมลภายในของบัญชี
 │   │   ├── address.js       ตัวเลือกที่อยู่ไทย จังหวัด → อำเภอ → ตำบล → รหัสไปรษณีย์
+│   │   ├── tree-data.js     แปลงข้อมูลความสัมพันธ์จาก Supabase เป็นรูปแบบของ family-chart (เฉพาะความสัมพันธ์ที่มี id)
 │   │   └── family.js        ช่องวันเกิด (ปี พ.ศ.), สวิตช์วันเกิดบิดา/มารดา/บุตรธิดา, รายชื่อบุตร/ธิดา
 │   └── pages/               โค้ดเฉพาะของแต่ละหน้า (ชื่อตรงกับไฟล์ .html)
 │       ├── register.js      สมัครสมาชิก; ถ้าพบชื่อบุคคลเดิม ต้องใช้ Claim Code
 │       ├── login.js         Username = ชื่อจริง, Password = วันเดือนปีเกิด `DDMMYYYY` (ปี พ.ศ.)
 │       ├── main.js          ค้นหาบุคคล
+│       ├── tree.js          แผนภาพต้นไม้ครอบครัว (family-chart): กดการ์ดเปิดโปรไฟล์, เลือกสมาชิกเริ่มต้น
 │       └── profile.js       ดูข้อมูลบุคคล (แสดงเฉพาะอายุ); แก้ไข/ลบได้เฉพาะข้อมูลของตนเอง
 ├── data/th-address.json     77 จังหวัด 930 อำเภอ/เขต 7,436 ตำบล/แขวง พร้อมรหัสไปรษณีย์ (ย่อจาก github.com/kongvut/thai-province-data)
 ├── sql/                     สคริปต์ฐานข้อมูล รันใน Supabase SQL Editor ตามลำดับเลข
@@ -25,7 +27,8 @@
 │   ├── 06-storage-avatar-policies.sql   สิทธิ์อัปโหลด/แก้/ลบรูปโปรไฟล์ใน bucket `family-avatars`
 │   ├── 07-birthdates-children.sql       ตารางวันเกิด/บุตรธิดา (อ่านได้เฉพาะเจ้าของ), `person_family_info()` คืนเฉพาะอายุ, `login_emails()` สำหรับหน้า Login
 │   ├── 08-nickname.sql                  ชื่อเล่น แสดงต่อท้ายชื่อ-นามสกุล เช่น แสนพล สุนทรนนท์ (แสน)
-│   └── 09-child-links.sql               เชื่อมบุตร/ธิดากับบุคคลในระบบจากชื่อ (กดดูข้อมูลได้เหมือนพ่อ/แม่)
+│   ├── 09-child-links.sql               เชื่อมบุตร/ธิดากับบุคคลในระบบจากชื่อ (กดดูข้อมูลได้เหมือนพ่อ/แม่)
+│   └── 10-family-tree.sql               คำนำหน้า, เบอร์คู่สมรส (เจ้าของเท่านั้น), สถานะมีชีวิตของพ่อ/แม่, `family_tree_data()` สำหรับต้นไม้
 └── supabase/                Edge Function `username-auth` (ไม่ได้ใช้และยังไม่ได้ deploy)
 ```
 

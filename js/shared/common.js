@@ -68,9 +68,12 @@ async function currentPerson() {
   if (dbError) throw dbError;
   return data || null;
 }
-// ชื่อ-นามสกุลพร้อมชื่อเล่นในวงเล็บ เช่น "แสนพล สุนทรนนท์ (แสน)"
+// คำนำหน้า ชื่อ-นามสกุล และชื่อเล่นในวงเล็บ เช่น "นาย แสนพล สุนทรนนท์ (แสน)"
+// คำนำหน้าใช้แสดงผลเท่านั้น ไม่ใช้เชื่อมความสัมพันธ์
 function displayName(p) {
-  const name = p?.full_name || "-";
+  const name = p?.full_name
+    ? [p.prefix, p.full_name].filter(Boolean).join(" ")
+    : "-";
   return p?.nickname ? `${name} (${p.nickname})` : name;
 }
 function avatarUrl(path) {

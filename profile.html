@@ -11,6 +11,7 @@
       <div class="wrap">
         <a class="brand" href="main.html">ทะเบียนเครือญาติ</a
         ><button id="homeBtn" class="navbtn">หน้า Home</button
+        ><a class="navbtn" href="tree.html">ต้นไม้ครอบครัว</a
         ><button id="logoutBtn" class="navbtn">ออกจากระบบ</button>
       </div>
     </header>
@@ -38,6 +39,9 @@
           <div class="row">
             <strong>คู่สมรส</strong><span id="spouse"></span>
           </div>
+          <div class="row" id="spousePhoneRow" hidden>
+            <strong>เบอร์คู่สมรส</strong><span id="spousePhone"></span>
+          </div>
           <h3 class="subhead">บุตร/ธิดา</h3>
           <div id="children"></div>
           <div id="ownerActions" class="actions" hidden>
@@ -53,7 +57,24 @@
             การแก้ไขวันเกิดไม่เปลี่ยนรหัสผ่าน
             เว้นแต่เลือกตั้งรหัสผ่านใหม่ด้านล่าง
           </p>
-          <label for="e_first">ชื่อจริง (Username) *</label
+          <label for="e_prefix">คำนำหน้า</label
+          ><input
+            id="e_prefix"
+            list="prefixList"
+            maxlength="20"
+            autocomplete="honorific-prefix"
+            placeholder="เช่น นาย นาง นางสาว"
+          /><datalist id="prefixList">
+            <option value="นาย"></option>
+            <option value="นาง"></option>
+            <option value="นางสาว"></option>
+            <option value="ด.ช."></option>
+            <option value="ด.ญ."></option>
+            <option value="ดร."></option>
+            <option value="ศ."></option>
+            <option value="รศ."></option>
+            <option value="ผศ."></option></datalist
+          ><label for="e_first">ชื่อจริง (Username) *</label
           ><input
             id="e_first"
             required
@@ -94,6 +115,7 @@
             maxlength="120"
             autocomplete="off"
           />
+          <div id="e_fatherAliveBox"></div>
           <div id="e_fatherBirthBox" class="switch-box"></div>
           <label for="e_mother">ชื่อ-นามสกุลมารดา</label
           ><input
@@ -102,6 +124,7 @@
             maxlength="120"
             autocomplete="off"
           />
+          <div id="e_motherAliveBox"></div>
           <div id="e_motherBirthBox" class="switch-box"></div>
           <label for="e_spouse">ชื่อ-นามสกุลคู่สมรส</label
           ><input
@@ -109,6 +132,14 @@
             list="peopleList"
             maxlength="120"
             autocomplete="off"
+          />
+          <label for="e_spousePhone">เบอร์ติดต่อคู่สมรส</label
+          ><input
+            id="e_spousePhone"
+            type="tel"
+            maxlength="20"
+            autocomplete="off"
+            placeholder="เช่น 0812345678"
           />
           <p class="hint">
             เลือกจากรายชื่อในระบบ

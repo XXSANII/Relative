@@ -16,7 +16,7 @@
       if (!q) return;
       const { data, error } = await sb
         .from("person")
-        .select("id,full_name,nickname,gender,avatar_path")
+        .select("id,prefix,full_name,nickname,gender,avatar_path")
         .ilike("full_name", `%${q.replace(/[%_,]/g, "")}%`)
         .order("full_name")
         .limit(30);

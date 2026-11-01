@@ -35,14 +35,17 @@
     if (infoError) throw infoError;
     $("age").textContent = ageText(info?.age);
     // มี id = ลงทะเบียนแล้ว กดเข้าไปดูได้ / มีแต่ชื่อ = ยังไม่ได้ลงทะเบียน แสดงเป็นข้อความ
-    const linkPerson = async (relId, relName, field, withAge, age) => {
-      const ageHtml = withAge
-        ? ` <span class="age-tag">อายุ ${esc(ageText(age))}</span>`
-        : "";
+    const linkPerson = async (relId, relName, field, withAge, age, alive) => {
+      // alive: true/false = สถานะมีชีวิต/เสียชีวิต (พ่อ/แม่) ; null/undefined = ไม่มีข้อมูล ไม่แสดง
+      const ageHtml =
+        (withAge && alive !== false
+          ? ` <span class="age-tag">อายุ ${esc(ageText(age))}</span>`
+          : "") +
+        (alive === false ? ' <span class="age-tag deceased">เสียชีวิต</span>' : "");
       if (relId) {
         const { data, error } = await sb
           .from("person")
-          .select("id,full_name,nickname")
+          .select("id,prefix,full_name,nickname")
           .eq("id", relId)
           .maybeSingle();
         if (error) throw error;
@@ -62,6 +65,7 @@
       "father",
       true,
       info?.father_age,
+      person.father_alive,
     );
     await linkPerson(
       person.mother_id,
@@ -69,8 +73,22 @@
       "mother",
       true,
       info?.mother_age,
+      person.mother_alive,
     );
     await linkPerson(person.spouse_id, person.spouse_name, "spouse", false);
+    // เบอร์คู่สมรสเห็นได้เฉพาะเจ้าของข้อมูล (RLS ของ person_private)
+    let spousePhone = null;
+    if (own) {
+      const { data: priv, error: privError } = await sb
+        .from("person_private")
+        .select("spouse_phone")
+        .eq("person_id", person.id)
+        .maybeSingle();
+      if (privError) throw privError;
+      spousePhone = priv?.spouse_phone || null;
+      $("spousePhoneRow").hidden = !spousePhone;
+      $("spousePhone").textContent = spousePhone || "-";
+    }
     // บุตร/ธิดาที่ลงทะเบียนแล้ว (person_id) กดเข้าไปดูได้ เหมือนพ่อ/แม่ (09-child-links.sql)
     const kidsInfo = info?.children || [];
     const childName = (c) =>
@@ -93,13 +111,16 @@
       birthIn = null,
       fatherBirth = null,
       motherBirth = null,
-      kidsEd = null;
+      kidsEd = null,
+      fatherAlive = null,
+      motherAlive = null;
     const [firstName, ...rest] = String(person.full_name || "")
       .trim()
       .split(/\s+/);
     $("editBtn").onclick = async () => {
       $("view").hidden = true;
       $("editForm").hidden = false;
+      $("e_prefix").value = person.prefix || "";
       $("e_first").value = firstName || "";
       $("e_last").value = rest.join(" ");
       $("e_nickname").value = person.nickname || "";
@@ -111,6 +132,7 @@
       $("e_father").value = person.father_name || "";
       $("e_mother").value = person.mother_name || "";
       $("e_spouse").value = person.spouse_name || "";
+      $("e_spousePhone").value = spousePhone || "";
       if (!birthIn) {
         birthIn = birthDateInput("e_birthBox", { label: "วันเดือนปีเกิด" });
         fatherBirth = optionalBirthDate("e_fatherBirthBox", {
@@ -122,7 +144,11 @@
           label: "วันเกิดของมารดา",
         });
         kidsEd = childrenEditor("e_childrenBox");
+        fatherAlive = aliveSwitch("e_fatherAliveBox", "บิดา");
+        motherAlive = aliveSwitch("e_motherAliveBox", "มารดา");
       }
+      fatherAlive.set(person.father_alive);
+      motherAlive.set(person.mother_alive);
       // วันเกิดจริงอ่านได้เฉพาะเจ้าของข้อมูล (RLS ใน 07-birthdates-children.sql)
       const [{ data: b, error: bError }, { data: kids, error: kError }] =
         await Promise.all([
@@ -215,7 +241,8 @@
         const birth_date = pick(birthIn.get()).value,
           father_birth_date = pick(fatherBirth.get()).value,
           mother_birth_date = pick(motherBirth.get()).value,
-          kids = pick(kidsEd.get());
+          kids = pick(kidsEd.get()),
+          spouse_phone = pick(readSpousePhone("e_spousePhone")).value;
         // เปลี่ยนรหัสผ่านเป็นวันเกิดเฉพาะเมื่อเลือกและยืนยันเท่านั้น (แก้วันเกิดอย่างเดียวไม่เปลี่ยนรหัสผ่าน)
         const resetPwd = own && $("e_resetPwd").checked;
         if (resetPwd && !birth_date)
@@ -229,6 +256,7 @@
           throw new Error("ยกเลิกการเปลี่ยนรหัสผ่าน ยังไม่ได้บันทึกข้อมูล");
         const rel = (k) => $(k).value.trim().replace(/\s+/g, " ") || null;
         const patch = {
+          prefix: $("e_prefix").value.trim().replace(/\s+/g, " ") || null,
           full_name: name,
           nickname: $("e_nickname").value.trim().replace(/\s+/g, " ") || null,
           phone,
@@ -238,6 +266,9 @@
           mother_name: rel("e_mother"),
           spouse_name: rel("e_spouse"),
         };
+        // ไม่มีชื่อพ่อ/แม่ = ยังไม่มีข้อมูล จึงไม่ระบุสถานะ
+        patch.father_alive = fatherAlive.get(!!patch.father_name);
+        patch.mother_alive = motherAlive.get(!!patch.mother_name);
         if (
           [patch.father_name, patch.mother_name, patch.spouse_name].some(
             (n) => n && normalize(n) === normalize(name),
@@ -297,6 +328,7 @@
           mother_birth_date,
         });
         await saveChildren(person.id, kids);
+        await savePrivate(person.id, { spouse_phone });
         if (patch.avatar_path && person.avatar_path)
           await sb.storage.from(AVATAR_BUCKET).remove([person.avatar_path]);
         location.reload();

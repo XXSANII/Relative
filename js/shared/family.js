@@ -235,6 +235,50 @@ function childrenEditor(boxId) {
   };
 }
 
+// สวิตช์สถานะมีชีวิตของพ่อ/แม่: เปิด = มีชีวิต, ปิด = เสียชีวิต
+// get(hasName) คืน true/false หรือ null เมื่อไม่ได้กรอกชื่อ (ยังไม่มีข้อมูลพ่อ/แม่ จึงไม่ระบุสถานะ)
+function aliveSwitch(boxId, who) {
+  const box = $(boxId),
+    sw = boxId + "_on";
+  box.innerHTML = switchHtml(sw, `${who}: มีชีวิต`);
+  const label = box.querySelector(".switch > span:last-child");
+  const render = () => {
+    label.textContent = `${who}: ${$(sw).checked ? "มีชีวิต" : "เสียชีวิต"}`;
+  };
+  $(sw).checked = true;
+  $(sw).addEventListener("change", render);
+  return {
+    set(alive) {
+      $(sw).checked = alive !== false;
+      render();
+    },
+    get(hasName) {
+      return hasName ? $(sw).checked : null;
+    },
+  };
+}
+
+// เบอร์คู่สมรส: ว่างได้ ถ้ากรอกต้องเป็นเบอร์โทรที่ถูกต้อง → {value} หรือ {error, focus}
+function readSpousePhone(inputId) {
+  const raw = $(inputId).value.trim();
+  if (!raw) return { value: null };
+  const phone = normalizePhone(raw);
+  if (!validPhone(phone))
+    return {
+      error: "กรุณากรอกเบอร์ติดต่อคู่สมรสให้ถูกต้อง เช่น 0812345678",
+      focus: inputId,
+    };
+  return { value: phone };
+}
+
+// ข้อมูลส่วนตัวที่อ่าน/แก้ได้เฉพาะเจ้าของ (person_private ใน 10-family-tree.sql)
+async function savePrivate(personId, values) {
+  const { error } = await sb
+    .from("person_private")
+    .upsert({ person_id: personId, ...values }, { onConflict: "person_id" });
+  if (error) throw error;
+}
+
 // บันทึกวันเกิด (เฉพาะคอลัมน์ที่ส่งมา) ลง person_birth
 async function saveBirthDates(personId, values) {
   const { error } = await sb

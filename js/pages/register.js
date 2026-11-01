@@ -22,6 +22,8 @@
     toggleLabel: "วันเดือนปีเกิดของมารดา",
     label: "วันเกิดของมารดา",
   });
+  const fatherAlive = aliveSwitch("fatherAliveBox", "บิดา");
+  const motherAlive = aliveSwitch("motherAliveBox", "มารดา");
   const kids = childrenEditor("childrenBox");
   // อ่านและตรวจวันเกิด/บุตรธิดาจากฟอร์ม
   const pick = (r) => {
@@ -37,6 +39,10 @@
     mother_birth_date: pick(motherBirth.get()).value,
     kids: pick(kids.get()),
     nickname: $("nickname").value.trim().replace(/\s+/g, " ") || null,
+    prefix: $("prefix").value.trim().replace(/\s+/g, " ") || null,
+    spouse_phone: pick(readSpousePhone("spousePhone")).value,
+    father_alive: fatherAlive.get(!!$("father").value.trim()),
+    mother_alive: motherAlive.get(!!$("mother").value.trim()),
   });
   // ข้อมูลเดิม (Claim) ไม่ได้บันทึกชื่อพ่อแม่จากฟอร์ม จึงไม่บันทึกวันเกิดพ่อแม่ด้วย
   const saveFamily = async (personId, f, isNew) => {
@@ -51,12 +57,13 @@
         : { birth_date: f.birth_date },
     );
     await saveChildren(personId, f.kids);
-    // ข้อมูลเดิม (Claim): บันทึกชื่อเล่นที่กรอกตอนสมัครลงแถวเดิม
-    if (!isNew && f.nickname) {
-      const { error } = await sb
-        .from("person")
-        .update({ nickname: f.nickname })
-        .eq("id", personId);
+    if (f.spouse_phone) await savePrivate(personId, { spouse_phone: f.spouse_phone });
+    // ข้อมูลเดิม (Claim): บันทึกคำนำหน้า/ชื่อเล่นที่กรอกตอนสมัครลงแถวเดิม
+    if (!isNew && (f.nickname || f.prefix)) {
+      const patch = {};
+      if (f.nickname) patch.nickname = f.nickname;
+      if (f.prefix) patch.prefix = f.prefix;
+      const { error } = await sb.from("person").update(patch).eq("id", personId);
       if (error) throw error;
     }
   };
@@ -226,6 +233,7 @@
           .from("person")
           .insert({
             full_name: name,
+            prefix: family.prefix,
             nickname: family.nickname,
             phone,
             gender,
@@ -233,6 +241,8 @@
             father_name,
             mother_name,
             spouse_name,
+            father_alive: family.father_alive,
+            mother_alive: family.mother_alive,
             auth_user_id: authData.user.id,
           })
           .select("id")
