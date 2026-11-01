@@ -547,3 +547,65 @@ a.navbtn {
   background-color: rgb(33, 33, 33);
   color: #fff;
 }
+.tree-canvas svg {
+  display: block;
+  cursor: grab;
+  touch-action: none;
+}
+.tree-canvas svg:active {
+  cursor: grabbing;
+}
+.tree-canvas .edge {
+  fill: none;
+  stroke: #9aa4b2;
+  stroke-width: 1.5;
+}
+.tree-canvas .edge.spouse {
+  stroke: #d4a72c;
+  stroke-dasharray: 6 4;
+}
+.tree-canvas .node {
+  cursor: pointer;
+}
+.tree-canvas .card-bg {
+  stroke: transparent;
+  stroke-width: 2;
+}
+.tree-canvas .card-bg.male {
+  fill: #4f7485;
+}
+.tree-canvas .card-bg.female {
+  fill: #a8646d;
+}
+.tree-canvas .card-bg.unknown {
+  fill: #5a6170;
+}
+.tree-canvas .node.selected .card-bg {
+  stroke: #fff;
+}
+.tree-canvas .tree-card {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-sizing: border-box;
+  height: 100%;
+  padding: 6px 8px;
+  color: #fff;
+  font-size: 13px;
+  line-height: 1.25;
+}
+.tree-canvas .tree-avatar {
+  width: 40px;
+  height: 40px;
+  flex: none;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #eef1f7;
+}
+.tree-canvas .tree-card span {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}

@@ -23,54 +23,84 @@
         : connected[0].id;
 
     const byId = new Map(connected.map((d) => [d.id, d]));
-    // เรียงอายุมาก → น้อย; ไม่มีวันเกิดอยู่ท้ายสุด; อายุเท่ากันเรียงตามชื่อ
-    const byAgeDesc = (a, b) => {
-      const x = a.data.age,
-        y = b.data.age;
-      if (x == null && y == null) return a.data.name.localeCompare(b.data.name, "th");
-      if (x == null) return 1;
-      if (y == null) return -1;
-      return y - x || a.data.name.localeCompare(b.data.name, "th");
-    };
-    const people = [...connected].sort(byAgeDesc);
+    const people = [...connected].sort(compareByAge);
     const search = $("treeSearch");
     const results = $("treeResults");
     search.value = byId.get(start).data.name;
     $("treeTools").hidden = false;
-    $("FamilyChart").hidden = false;
+    $("treeCanvas").hidden = false;
 
-    const chart = f3.createChart("#FamilyChart", connected);
-    // ลูกและคู่สมรสที่ติดกันในระดับเดียวกัน เรียงอายุมาก → น้อย จากซ้ายไปขวา
-    // family-chart เรียงได้เฉพาะในกลุ่มของพ่อแม่คู่เดียวกัน ไม่ได้เรียงข้ามครอบครัวในรุ่นเดียวกัน
-    chart
-      .setCardYSpacing(130)
-      .setCardXSpacing(250)
-      .setShowSiblingsOfMain(true)
-      .setTransitionTime(400)
-      .setSortChildrenFunction(byAgeDesc)
-      .setSortSpousesFunction((d, data) => {
-        const spouses = d.rels?.spouses;
-        if (!spouses) return;
-        spouses.sort((x, y) => {
-          const a = data.find((p) => p.id === x),
-            b = data.find((p) => p.id === y);
-          return a && b ? byAgeDesc(a, b) : 0;
-        });
+    // แผนภาพ: แต่ละรุ่นเป็นแถว เรียงอายุมาก → น้อยจากซ้ายไปขวาทั้งแถว (tree-layout.js)
+    const layout = computeTreeLayout(connected);
+    const el = $("treeCanvas");
+    const svg = d3
+      .select(el)
+      .append("svg")
+      .attr("width", "100%")
+      .attr("height", "100%")
+      .attr("role", "img")
+      .attr("aria-label", "แผนภาพต้นไม้ครอบครัว");
+    const g = svg.append("g");
+    const zoom = d3
+      .zoom()
+      .scaleExtent([0.2, 3])
+      .on("zoom", (e) => g.attr("transform", e.transform));
+    svg.call(zoom).on("dblclick.zoom", null);
+
+    g.append("g")
+      .selectAll("path")
+      .data(layout.edges)
+      .join("path")
+      .attr("class", (d) => `edge ${d.type}`)
+      .attr("d", (d) => d.d);
+
+    const cards = g
+      .append("g")
+      .selectAll("g")
+      .data(layout.nodes)
+      .join("g")
+      .attr("class", "node")
+      .attr("transform", (d) => `translate(${d.x},${d.y})`)
+      .on("click", (e, d) => {
+        location.href = `profile.html?id=${d.id}`;
       });
-    chart
-      .setCardHtml()
-      .setCardDisplay([(d) => esc(d.data.name)])
-      .setOnCardClick((e, d) => {
-        location.href = `profile.html?id=${d.data.id}`;
-      });
-    chart.updateMainId(start);
-    chart.updateTree({ initial: true });
+    cards
+      .append("rect")
+      .attr("class", (d) => `card-bg ${d.data.gender === "F" ? "female" : d.data.gender === "M" ? "male" : "unknown"}`)
+      .attr("width", layout.cardW)
+      .attr("height", layout.cardH)
+      .attr("rx", 10);
+    cards
+      .append("foreignObject")
+      .attr("width", layout.cardW)
+      .attr("height", layout.cardH)
+      .html(
+        (d) =>
+          `<div class="tree-card"><img class="tree-avatar" src="${esc(d.data.avatar || DEFAULT_AVATAR)}" alt=""><span>${esc(d.data.name)}</span></div>`,
+      );
+
+    // โฟกัสที่สมาชิกหนึ่งคน: จัดให้อยู่กลางพื้นที่ และไฮไลต์การ์ด
+    const focus = (id, animate) => {
+      const n = layout.nodes.find((x) => x.id === id);
+      if (!n) return;
+      cards.classed("selected", (d) => d.id === id);
+      const k = d3.zoomTransform(svg.node()).k || 1;
+      const t = d3.zoomIdentity
+        .translate(
+          el.clientWidth / 2 - k * (n.x + layout.cardW / 2),
+          el.clientHeight / 2 - k * (n.y + layout.cardH / 2),
+        )
+        .scale(k);
+      const target = animate ? svg.transition().duration(400) : svg;
+      target.call(zoom.transform, t);
+    };
+    focus(start, false);
+
     // ค้นหาจากชื่อหรือชื่อเล่น แสดงผลลัพธ์เฉพาะเมื่อพิมพ์ (เหมือนหน้า Home) เลือกแล้วย้ายแผนภาพไปที่คนนั้น
     const pick = (id) => {
       search.value = byId.get(id).data.name;
       results.innerHTML = "";
-      chart.updateMainId(id);
-      chart.updateTree({ initial: false });
+      focus(id, true);
     };
     search.addEventListener("input", () => {
       const q = normalize(search.value);
