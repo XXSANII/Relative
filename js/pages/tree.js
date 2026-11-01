@@ -40,11 +40,23 @@
     $("FamilyChart").hidden = false;
 
     const chart = f3.createChart("#FamilyChart", connected);
+    // ลูกและคู่สมรสที่ติดกันในระดับเดียวกัน เรียงอายุมาก → น้อย จากซ้ายไปขวา
+    // family-chart เรียงได้เฉพาะในกลุ่มของพ่อแม่คู่เดียวกัน ไม่ได้เรียงข้ามครอบครัวในรุ่นเดียวกัน
     chart
       .setCardYSpacing(130)
       .setCardXSpacing(250)
       .setShowSiblingsOfMain(true)
-      .setTransitionTime(400);
+      .setTransitionTime(400)
+      .setSortChildrenFunction(byAgeDesc)
+      .setSortSpousesFunction((d, data) => {
+        const spouses = d.rels?.spouses;
+        if (!spouses) return;
+        spouses.sort((x, y) => {
+          const a = data.find((p) => p.id === x),
+            b = data.find((p) => p.id === y);
+          return a && b ? byAgeDesc(a, b) : 0;
+        });
+      });
     chart
       .setCardHtml()
       .setCardDisplay([(d) => esc(d.data.name)])
