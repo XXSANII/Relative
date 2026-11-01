@@ -26,6 +26,7 @@
     $("ownerLabel").textContent = own ? "โปรไฟล์ของคุณ" : "ข้อมูลญาติ";
     $("gender").textContent = GENDER[person.gender] || "ไม่ระบุ";
     $("phone").textContent = person.phone || "-";
+    $("line").textContent = person.line_id || "-";
     $("address").textContent = composeAddress(person) || person.address || "-";
     // อายุคำนวณในฐานข้อมูลจากวันที่ปัจจุบัน หน้าเว็บไม่ได้รับวันเกิดจริงของผู้อื่น
     const { data: info, error: infoError } = await sb.rpc(
@@ -125,6 +126,7 @@
       $("e_last").value = rest.join(" ");
       $("e_nickname").value = person.nickname || "";
       $("e_phone").value = person.phone || "";
+      $("e_line").value = person.line_id || "";
       $("e_gender").value = person.gender || "";
       if (!addrPicker)
         addrPicker = await initAddressPicker("e_", "e_addressBox");
@@ -225,6 +227,9 @@
         if (last.length < 2) throw new Error("กรุณากรอกนามสกุลให้ถูกต้อง");
         if (!validPhone(phone))
           throw new Error("กรุณากรอกเบอร์โทรศัพท์ให้ถูกต้อง เช่น 0812345678");
+        const lineId = $("e_line").value.trim() || null;
+        if (lineId && !validLineId(lineId))
+          throw new Error("LINE ID ต้องมี 4–20 ตัวอักษร ใช้ได้เฉพาะ a-z 0-9 . _ -");
         const name = `${first} ${last}`;
         const addr = addrPicker.get();
         if (addr.error) {
@@ -260,6 +265,7 @@
           full_name: name,
           nickname: $("e_nickname").value.trim().replace(/\s+/g, " ") || null,
           phone,
+          line_id: lineId,
           gender: $("e_gender").value || null,
           ...addr.values,
           father_name: rel("e_father"),

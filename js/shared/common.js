@@ -32,6 +32,10 @@ function normalizePhone(s) {
 function validPhone(phone) {
   return /^0\d{8,9}$/.test(phone);
 }
+// LINE ID: 4–20 ตัว ใช้ได้เฉพาะ a-z 0-9 . _ - (ตรงกับ check constraint ใน 12-line-contact.sql)
+function validLineId(id) {
+  return /^[a-zA-Z0-9._-]{4,20}$/.test(id);
+}
 async function sha256Hex(text) {
   const hash = await crypto.subtle.digest(
     "SHA-256",
