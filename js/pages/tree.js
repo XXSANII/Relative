@@ -22,12 +22,13 @@
         ? String(me.id)
         : connected[0].id;
 
-    const select = $("startFrom");
-    select.innerHTML = [...connected]
-      .sort((a, b) => a.data.name.localeCompare(b.data.name, "th"))
-      .map((d) => `<option value="${d.id}">${esc(d.data.name)}</option>`)
-      .join("");
-    select.value = start;
+    const byId = new Map(connected.map((d) => [d.id, d]));
+    const people = [...connected].sort((a, b) =>
+      a.data.name.localeCompare(b.data.name, "th"),
+    );
+    const search = $("treeSearch");
+    const results = $("treeResults");
+    search.value = byId.get(start).data.name;
     $("treeTools").hidden = false;
     $("FamilyChart").hidden = false;
 
@@ -45,9 +46,37 @@
       });
     chart.updateMainId(start);
     chart.updateTree({ initial: true });
-    select.addEventListener("change", () => {
-      chart.updateMainId(select.value);
+    // ค้นหาจากชื่อหรือชื่อเล่น แสดงผลลัพธ์เฉพาะเมื่อพิมพ์ (เหมือนหน้า Home) เลือกแล้วย้ายแผนภาพไปที่คนนั้น
+    const pick = (id) => {
+      search.value = byId.get(id).data.name;
+      results.innerHTML = "";
+      chart.updateMainId(id);
       chart.updateTree({ initial: false });
+    };
+    search.addEventListener("input", () => {
+      const q = normalize(search.value);
+      const list = q
+        ? people.filter((d) =>
+            [d.data.name, d.data.nickname].some((s) =>
+              normalize(s).includes(q),
+            ),
+          )
+        : [];
+      results.innerHTML = list.length
+        ? list
+            .slice(0, 30)
+            .map(
+              (d) =>
+                `<button class="person-result" data-id="${d.id}"><img class="avatar small" src="${esc(d.data.avatar || DEFAULT_AVATAR)}" alt=""><span><strong>${esc(d.data.name)}</strong>${d.data.nickname ? `<br><span class="muted">(${esc(d.data.nickname)})</span>` : ""}</span></button>`,
+            )
+            .join("")
+        : q
+          ? '<p class="muted">ไม่พบรายชื่อที่ตรงกัน</p>'
+          : "";
+    });
+    results.addEventListener("click", (e) => {
+      const b = e.target.closest("[data-id]");
+      if (b) pick(b.dataset.id);
     });
   } catch (e) {
     showMessage("message", e.message || "โหลดต้นไม้ครอบครัวไม่สำเร็จ");

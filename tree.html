@@ -29,8 +29,14 @@
         </p>
         <div id="message" hidden></div>
         <div id="treeTools" hidden>
-          <label for="startFrom">เริ่มดูจากสมาชิก</label
-          ><select id="startFrom"></select>
+          <label for="treeSearch">ค้นหาสมาชิกเพื่อเริ่มดูจาก</label>
+          <input
+            id="treeSearch"
+            type="search"
+            placeholder="เช่น สมชาย ใจดี"
+            autocomplete="off"
+          />
+          <div id="treeResults" class="results"></div>
         </div>
         <div id="emptyState" class="muted" hidden>
           ยังมีข้อมูลความสัมพันธ์ไม่เพียงพอสำหรับสร้างต้นไม้ครอบครัว
