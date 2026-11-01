@@ -54,6 +54,9 @@
       if(firstName.length<2||/\s/.test(firstName)) throw new Error('กรุณากรอกชื่อจริงเป็นคำเดียว (ไม่ต้องใส่นามสกุล)');
       if(lastName.length<2) throw new Error('กรุณากรอกนามสกุลให้ถูกต้อง');
       if(!validPhone(phone)) throw new Error('กรุณากรอกเบอร์โทรศัพท์ให้ถูกต้อง เช่น 0812345678');
+      const rel=k=>$(k).value.trim().replace(/\s+/g,' ')||null;
+      const father_name=rel('father'),mother_name=rel('mother'),spouse_name=rel('spouse');
+      if([father_name,mother_name,spouse_name].some(n=>n&&normalize(n)===normalize(name))) throw new Error('ชื่อพ่อ แม่ หรือคู่สมรส ต้องไม่ใช่ชื่อของตัวเอง');
       const family=readFamily();
       // รหัสผ่าน = วันเดือนปีเกิด DDMMYYYY (ปี พ.ศ.) ส่งให้ Supabase Auth เก็บแบบ hash เท่านั้น
       const password=birthPassword(family.birth_date);
@@ -99,9 +102,8 @@
         await saveFamily(personId,family,false);
       } else {
         // No existing person with this normalized name: create a new record for this account.
-        // เก็บชื่อพ่อแม่เป็นข้อความ ฐานข้อมูลจะเชื่อมเป็นลิงก์ให้เมื่อบุคคลนั้นมีในระบบ (04-relation-names.sql)
-        const father_name=$('father').value.trim()||null,mother_name=$('mother').value.trim()||null;
-        const {data:person,error:personError}=await sb.from('person').insert({full_name:name,phone,gender,...addr.values,father_name,mother_name,auth_user_id:authData.user.id}).select('id').single();
+        // เก็บชื่อพ่อแม่/คู่สมรสเป็นข้อความ ฐานข้อมูลจะเชื่อมเป็นลิงก์ให้เมื่อบุคคลนั้นมีในระบบ (04-relation-names.sql)
+        const {data:person,error:personError}=await sb.from('person').insert({full_name:name,phone,gender,...addr.values,father_name,mother_name,spouse_name,auth_user_id:authData.user.id}).select('id').single();
         if(personError) throw personError;
         personId=person.id;
         await saveFamily(personId,family,true);
