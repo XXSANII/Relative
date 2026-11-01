@@ -30,7 +30,8 @@
 │   ├── 09-child-links.sql               เชื่อมบุตร/ธิดากับบุคคลในระบบจากชื่อ (กดดูข้อมูลได้เหมือนพ่อ/แม่)
 │   ├── 10-family-tree.sql               คำนำหน้า, เบอร์คู่สมรส (เจ้าของเท่านั้น), สถานะมีชีวิตของพ่อ/แม่, `family_tree_data()` สำหรับต้นไม้
 │   ├── 11-family-circles.sql            แยกวงครอบครัว: เห็นเฉพาะนามสกุลเดียวกัน + ญาติที่เชื่อมแล้ว (RLS ของ person, `visible_person_ids()`)
-│   └── 12-line-contact.sql             ช่องทางติดต่อ LINE ID ในโปรไฟล์
+│   ├── 12-line-contact.sql             ช่องทางติดต่อ LINE ID ในโปรไฟล์
+│   └── 13-tree-age.sql                 เพิ่มอายุใน family_tree_data() สำหรับเรียงลำดับในหน้าต้นไม้
 └── supabase/                Edge Function `username-auth` (ไม่ได้ใช้และยังไม่ได้ deploy)
 ```
 
@@ -47,6 +48,7 @@
 10. รัน `sql/10-family-tree.sql` (หลัง 09; **ต้องรันก่อนใช้หน้าเว็บเวอร์ชันนี้** ไม่เช่นนั้นลงทะเบียน/แก้ไขโปรไฟล์จะ error เพราะยังไม่มีคอลัมน์ใหม่)
 11. รัน `sql/11-family-circles.sql` (หลัง 10; เปลี่ยนสิทธิ์อ่านตาราง person จาก "ทุกคน" เป็น "เฉพาะวงครอบครัว" ต้องรันก่อน deploy เว็บเวอร์ชันนี้ เพราะหน้าลงทะเบียนเรียกฟังก์ชัน `person_name_taken`)
 12. รัน `sql/12-line-contact.sql` (หลัง 11; ต้องรันก่อน deploy เว็บเวอร์ชันนี้ ไม่เช่นนั้นการบันทึกโปรไฟล์จะ error)
+13. รัน `sql/13-tree-age.sql` (หลัง 11; ไม่รันก็ใช้งานได้ แต่การเรียงตามอายุจะไม่ทำงาน)
 10. ตรวจว่า RLS บน `person` มี SELECT สำหรับ authenticated และ INSERT/UPDATE/DELETE เฉพาะ `auth_user_id = auth.uid()` เท่านั้น และไม่มี policy anon แบบเปิดกว้างหลงเหลือ
 11. ใน Supabase Auth หากใช้ username ที่แปลงเป็นอีเมลภายใน ให้ปิด Confirm email สำหรับเดโมนี้ มิฉะนั้นต้องทำ flow ยืนยันบัญชีให้ครบก่อนเชื่อมข้อมูล
 12. ตั้ง Storage bucket `family-avatars` เป็น public เพื่อให้ `getPublicUrl()` ใช้ได้ หรือปรับโค้ดเป็น signed URLs และกำหนด Storage policies ให้ปลอดภัย

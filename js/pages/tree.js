@@ -23,9 +23,16 @@
         : connected[0].id;
 
     const byId = new Map(connected.map((d) => [d.id, d]));
-    const people = [...connected].sort((a, b) =>
-      a.data.name.localeCompare(b.data.name, "th"),
-    );
+    // เรียงอายุมาก → น้อย; ไม่มีวันเกิดอยู่ท้ายสุด; อายุเท่ากันเรียงตามชื่อ
+    const byAgeDesc = (a, b) => {
+      const x = a.data.age,
+        y = b.data.age;
+      if (x == null && y == null) return a.data.name.localeCompare(b.data.name, "th");
+      if (x == null) return 1;
+      if (y == null) return -1;
+      return y - x || a.data.name.localeCompare(b.data.name, "th");
+    };
+    const people = [...connected].sort(byAgeDesc);
     const search = $("treeSearch");
     const results = $("treeResults");
     search.value = byId.get(start).data.name;
@@ -67,7 +74,7 @@
             .slice(0, 30)
             .map(
               (d) =>
-                `<button class="person-result" data-id="${d.id}"><img class="avatar small" src="${esc(d.data.avatar || DEFAULT_AVATAR)}" alt=""><span><strong>${esc(d.data.name)}</strong></span></button>`,
+                `<button class="person-result" data-id="${d.id}"><img class="avatar small" src="${esc(d.data.avatar || DEFAULT_AVATAR)}" alt=""><span><strong>${esc(d.data.name)}</strong>${d.data.age != null ? `<br><span class="muted">อายุ ${d.data.age} ปี</span>` : ""}</span></button>`,
             )
             .join("")
         : q
