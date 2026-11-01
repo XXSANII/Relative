@@ -42,6 +42,7 @@
 7. รัน `sql/07-birthdates-children.sql` (ต้องรันก่อน deploy หน้าเว็บเวอร์ชันนี้ ไม่เช่นนั้นเข้าสู่ระบบและลงทะเบียนไม่ได้)
 8. รัน `sql/08-nickname.sql` (ต้องรันก่อน deploy หน้าเว็บเวอร์ชันนี้ เพราะหน้าเว็บบันทึกและอ่านคอลัมน์ `nickname`)
 9. รัน `sql/09-child-links.sql` (หลัง 08; ถ้าไม่รัน ชื่อบุตร/ธิดาจะกดดูข้อมูลไม่ได้)
+10. รัน `sql/10-family-tree.sql` (หลัง 09; **ต้องรันก่อนใช้หน้าเว็บเวอร์ชันนี้** ไม่เช่นนั้นลงทะเบียน/แก้ไขโปรไฟล์จะ error เพราะยังไม่มีคอลัมน์ใหม่)
 10. ตรวจว่า RLS บน `person` มี SELECT สำหรับ authenticated และ INSERT/UPDATE/DELETE เฉพาะ `auth_user_id = auth.uid()` เท่านั้น และไม่มี policy anon แบบเปิดกว้างหลงเหลือ
 11. ใน Supabase Auth หากใช้ username ที่แปลงเป็นอีเมลภายใน ให้ปิด Confirm email สำหรับเดโมนี้ มิฉะนั้นต้องทำ flow ยืนยันบัญชีให้ครบก่อนเชื่อมข้อมูล
 12. ตั้ง Storage bucket `family-avatars` เป็น public เพื่อให้ `getPublicUrl()` ใช้ได้ หรือปรับโค้ดเป็น signed URLs และกำหนด Storage policies ให้ปลอดภัย
