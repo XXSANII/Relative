@@ -133,7 +133,8 @@ function childrenEditor(boxId) {
   const box = $(boxId),
     sw = boxId + "_on";
   box.innerHTML = `<h3 class="subhead">บุตร/ธิดา</h3>${switchHtml(sw, "วันเดือนปีเกิดของบุตร/ธิดา")}<p class="hint" hidden></p>
-    <div class="child-list"></div><button type="button" class="ghost add-child">+ เพิ่มบุตร/ธิดา</button>`;
+    <div class="child-list"></div><button type="button" class="ghost add-child">+ เพิ่มบุตร/ธิดา</button>
+    <p class="hint">กรอกชื่อ-นามสกุลให้ตรงกับในระบบ หน้าโปรไฟล์จะกดเข้าไปดูข้อมูลได้ ถ้ายังไม่ได้ลงทะเบียน ระบบจะเชื่อมให้เมื่อลงทะเบียน</p>`;
   const list = box.querySelector(".child-list"),
     note = box.querySelector(".hint");
   let rows = [],
@@ -156,7 +157,7 @@ function childrenEditor(boxId) {
     const n = ++birthSeq;
     el.innerHTML = `<div class="child-fields">
         <div><label for="cr${n}">ความสัมพันธ์</label><select id="cr${n}"><option value="son">บุตร</option><option value="daughter">ธิดา</option></select></div>
-        <div><label for="cn${n}">ชื่อ *</label><input id="cn${n}" maxlength="120" autocomplete="off" placeholder="ชื่อ-นามสกุล"></div>
+        <div><label for="cn${n}">ชื่อ *</label><input id="cn${n}" list="peopleList" maxlength="120" autocomplete="off" placeholder="ชื่อ-นามสกุล"></div>
       </div><div class="child-birth"></div><button type="button" class="danger remove-child">ลบรายการนี้</button>`;
     list.appendChild(el);
     const r = {

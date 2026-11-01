@@ -71,9 +71,14 @@
       info?.mother_age,
     );
     await linkPerson(person.spouse_id, person.spouse_name, "spouse", false);
+    // บุตร/ธิดาที่ลงทะเบียนแล้ว (person_id) กดเข้าไปดูได้ เหมือนพ่อ/แม่ (09-child-links.sql)
     const kidsInfo = info?.children || [];
+    const childName = (c) =>
+      c.person_id
+        ? `<button class="relation" data-person="${c.person_id}">${esc(displayName(c))}</button>`
+        : `<span class="pending">${esc(c.name)}<small>(ยังไม่ได้ลงทะเบียน)</small></span>`;
     $("children").innerHTML = kidsInfo.length
-      ? `<table class="family-table"><thead><tr><th>ความสัมพันธ์</th><th>ชื่อ</th><th>อายุ</th></tr></thead><tbody>${kidsInfo.map((c) => `<tr><td>${esc(CHILD_RELATION[c.relation] || "-")}</td><td>${esc(c.name)}</td><td>${esc(ageText(c.age))}</td></tr>`).join("")}</tbody></table>`
+      ? `<table class="family-table"><thead><tr><th>ความสัมพันธ์</th><th>ชื่อ</th><th>อายุ</th></tr></thead><tbody>${kidsInfo.map((c) => `<tr><td>${esc(CHILD_RELATION[c.relation] || "-")}</td><td>${childName(c)}</td><td>${esc(ageText(c.age))}</td></tr>`).join("")}</tbody></table>`
       : '<p class="muted">-</p>';
     document
       .querySelectorAll("[data-person]")
