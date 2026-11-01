@@ -23,7 +23,8 @@
 │   ├── 04-relation-names.sql            ชื่อพ่อ/แม่/คู่สมรส และเชื่อมลิงก์อัตโนมัติเมื่อบุคคลนั้นลงทะเบียน
 │   ├── 05-address-fields.sql            คอลัมน์ที่อยู่แบบแยกส่วน
 │   ├── 06-storage-avatar-policies.sql   สิทธิ์อัปโหลด/แก้/ลบรูปโปรไฟล์ใน bucket `family-avatars`
-│   └── 07-birthdates-children.sql       ตารางวันเกิด/บุตรธิดา (อ่านได้เฉพาะเจ้าของ), `person_family_info()` คืนเฉพาะอายุ, `login_emails()` สำหรับหน้า Login
+│   ├── 07-birthdates-children.sql       ตารางวันเกิด/บุตรธิดา (อ่านได้เฉพาะเจ้าของ), `person_family_info()` คืนเฉพาะอายุ, `login_emails()` สำหรับหน้า Login
+│   └── 08-nickname.sql                  ชื่อเล่น แสดงต่อท้ายชื่อ-นามสกุล เช่น แสนพล สุนทรนนท์ (แสน)
 └── supabase/                Edge Function `username-auth` (ไม่ได้ใช้และยังไม่ได้ deploy)
 ```
 
@@ -35,10 +36,11 @@
 5. รัน `sql/05-address-fields.sql` (ต้องรันก่อน deploy หน้าเว็บเวอร์ชันนี้)
 6. รัน `sql/06-storage-avatar-policies.sql` (ถ้าไม่รัน การแนบรูปจะขึ้น row-level security error)
 7. รัน `sql/07-birthdates-children.sql` (ต้องรันก่อน deploy หน้าเว็บเวอร์ชันนี้ ไม่เช่นนั้นเข้าสู่ระบบและลงทะเบียนไม่ได้)
-8. ตรวจว่า RLS บน `person` มี SELECT สำหรับ authenticated และ INSERT/UPDATE/DELETE เฉพาะ `auth_user_id = auth.uid()` เท่านั้น และไม่มี policy anon แบบเปิดกว้างหลงเหลือ
-9. ใน Supabase Auth หากใช้ username ที่แปลงเป็นอีเมลภายใน ให้ปิด Confirm email สำหรับเดโมนี้ มิฉะนั้นต้องทำ flow ยืนยันบัญชีให้ครบก่อนเชื่อมข้อมูล
-10. ตั้ง Storage bucket `family-avatars` เป็น public เพื่อให้ `getPublicUrl()` ใช้ได้ หรือปรับโค้ดเป็น signed URLs และกำหนด Storage policies ให้ปลอดภัย
-11. เปิดผ่าน VS Code Live Server หรือเว็บเซิร์ฟเวอร์ ไม่แนะนำ `file://`
+8. รัน `sql/08-nickname.sql` (ต้องรันก่อน deploy หน้าเว็บเวอร์ชันนี้ เพราะหน้าเว็บบันทึกและอ่านคอลัมน์ `nickname`)
+9. ตรวจว่า RLS บน `person` มี SELECT สำหรับ authenticated และ INSERT/UPDATE/DELETE เฉพาะ `auth_user_id = auth.uid()` เท่านั้น และไม่มี policy anon แบบเปิดกว้างหลงเหลือ
+10. ใน Supabase Auth หากใช้ username ที่แปลงเป็นอีเมลภายใน ให้ปิด Confirm email สำหรับเดโมนี้ มิฉะนั้นต้องทำ flow ยืนยันบัญชีให้ครบก่อนเชื่อมข้อมูล
+11. ตั้ง Storage bucket `family-avatars` เป็น public เพื่อให้ `getPublicUrl()` ใช้ได้ หรือปรับโค้ดเป็น signed URLs และกำหนด Storage policies ให้ปลอดภัย
+12. เปิดผ่าน VS Code Live Server หรือเว็บเซิร์ฟเวอร์ ไม่แนะนำ `file://`
 
 ## การเชื่อมบุคคลเดิม
 ผู้ดูแลสร้าง Claim Code สำหรับ `person.id` ที่ยืนยันตัวบุคคลแล้ว และส่งให้เจ้าตัวผ่านช่องทางที่เชื่อถือได้ รหัสมีอายุจำกัดและใช้ได้ครั้งเดียว อย่าออก Claim Code โดยอาศัยชื่ออย่างเดียว

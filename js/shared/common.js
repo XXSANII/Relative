@@ -68,6 +68,11 @@ async function currentPerson() {
   if (dbError) throw dbError;
   return data || null;
 }
+// ชื่อ-นามสกุลพร้อมชื่อเล่นในวงเล็บ เช่น "แสนพล สุนทรนนท์ (แสน)"
+function displayName(p) {
+  const name = p?.full_name || "-";
+  return p?.nickname ? `${name} (${p.nickname})` : name;
+}
 function avatarUrl(path) {
   if (!path) return DEFAULT_AVATAR;
   return sb.storage.from(AVATAR_BUCKET).getPublicUrl(path).data.publicUrl;

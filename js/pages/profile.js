@@ -22,7 +22,7 @@
     person = data;
     const own = person.id === me.id;
     $("avatar").src = avatarUrl(person.avatar_path);
-    $("name").textContent = person.full_name || "-";
+    $("name").textContent = displayName(person);
     $("ownerLabel").textContent = own ? "โปรไฟล์ของคุณ" : "ข้อมูลญาติ";
     $("gender").textContent = GENDER[person.gender] || "ไม่ระบุ";
     $("phone").textContent = person.phone || "-";
@@ -42,13 +42,13 @@
       if (relId) {
         const { data, error } = await sb
           .from("person")
-          .select("id,full_name")
+          .select("id,full_name,nickname")
           .eq("id", relId)
           .maybeSingle();
         if (error) throw error;
         if (data) {
           $(field).innerHTML =
-            `<button class="relation" data-person="${data.id}">${esc(data.full_name)}</button>${ageHtml}`;
+            `<button class="relation" data-person="${data.id}">${esc(displayName(data))}</button>${ageHtml}`;
           return;
         }
       }
@@ -97,6 +97,7 @@
       $("editForm").hidden = false;
       $("e_first").value = firstName || "";
       $("e_last").value = rest.join(" ");
+      $("e_nickname").value = person.nickname || "";
       $("e_phone").value = person.phone || "";
       $("e_gender").value = person.gender || "";
       if (!addrPicker)
@@ -224,6 +225,7 @@
         const rel = (k) => $(k).value.trim().replace(/\s+/g, " ") || null;
         const patch = {
           full_name: name,
+          nickname: $("e_nickname").value.trim().replace(/\s+/g, " ") || null,
           phone,
           gender: $("e_gender").value || null,
           ...addr.values,

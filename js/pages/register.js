@@ -36,6 +36,7 @@
     father_birth_date: pick(fatherBirth.get()).value,
     mother_birth_date: pick(motherBirth.get()).value,
     kids: pick(kids.get()),
+    nickname: $("nickname").value.trim().replace(/\s+/g, " ") || null,
   });
   // ข้อมูลเดิม (Claim) ไม่ได้บันทึกชื่อพ่อแม่จากฟอร์ม จึงไม่บันทึกวันเกิดพ่อแม่ด้วย
   const saveFamily = async (personId, f, isNew) => {
@@ -50,6 +51,14 @@
         : { birth_date: f.birth_date },
     );
     await saveChildren(personId, f.kids);
+    // ข้อมูลเดิม (Claim): บันทึกชื่อเล่นที่กรอกตอนสมัครลงแถวเดิม
+    if (!isNew && f.nickname) {
+      const { error } = await sb
+        .from("person")
+        .update({ nickname: f.nickname })
+        .eq("id", personId);
+      if (error) throw error;
+    }
   };
 
   $("avatar").addEventListener("change", () => {
@@ -217,6 +226,7 @@
           .from("person")
           .insert({
             full_name: name,
+            nickname: family.nickname,
             phone,
             gender,
             ...addr.values,

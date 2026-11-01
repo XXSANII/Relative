@@ -16,7 +16,7 @@
       if (!q) return;
       const { data, error } = await sb
         .from("person")
-        .select("id,full_name,gender,avatar_path")
+        .select("id,full_name,nickname,gender,avatar_path")
         .ilike("full_name", `%${q.replace(/[%_,]/g, "")}%`)
         .order("full_name")
         .limit(30);
@@ -28,7 +28,7 @@
       box.innerHTML = data
         .map(
           (x) =>
-            `<button class="person-result" data-id="${x.id}"><img class="avatar small" src="${avatarUrl(x.avatar_path)}" alt=""><span><strong>${esc(x.full_name)}</strong><br><span class="muted">${esc(GENDER[x.gender] || "ไม่ระบุ")}</span></span></button>`,
+            `<button class="person-result" data-id="${x.id}"><img class="avatar small" src="${avatarUrl(x.avatar_path)}" alt=""><span><strong>${esc(displayName(x))}</strong><br><span class="muted">${esc(GENDER[x.gender] || "ไม่ระบุ")}</span></span></button>`,
         )
         .join("");
     };
