@@ -193,19 +193,16 @@
           "บัญชีถูกสร้างแล้ว แต่ยังไม่มี session กรุณาปิด Confirm email ใน Supabase Auth หรือใช้ flow ยืนยันบัญชีที่ตั้งค่าไว้",
         );
 
-      // Read existing people only after authentication. Never link by name alone.
-      const { data: matches, error: matchError } = await sb
-        .from("person")
-        .select("id,full_name,auth_user_id")
-        .ilike("full_name", name)
-        .limit(10);
-      if (matchError) throw matchError;
-      const exact = (matches || []).filter(
-        (p) => normalize(p.full_name) === normalize(name),
+      // ตรวจชื่อซ้ำผ่านฟังก์ชัน เพราะผู้สมัครใหม่ยังไม่มีวงครอบครัวจึงอ่านรายชื่อโดยตรงไม่ได้ (11-family-circles.sql)
+      // Never link by name alone.
+      const { data: nameTaken, error: matchError } = await sb.rpc(
+        "person_name_taken",
+        { p_name: name },
       );
+      if (matchError) throw matchError;
       let personId = null;
 
-      if (exact.length > 0) {
+      if (nameTaken) {
         if (!claimCode) {
           showMessage(
             "message",
