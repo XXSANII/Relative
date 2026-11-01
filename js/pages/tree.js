@@ -67,7 +67,7 @@
             .slice(0, 30)
             .map(
               (d) =>
-                `<button class="person-result" data-id="${d.id}"><img class="avatar small" src="${esc(d.data.avatar || DEFAULT_AVATAR)}" alt=""><span><strong>${esc(d.data.name)}</strong>${d.data.nickname ? `<br><span class="muted">(${esc(d.data.nickname)})</span>` : ""}</span></button>`,
+                `<button class="person-result" data-id="${d.id}"><img class="avatar small" src="${esc(d.data.avatar || DEFAULT_AVATAR)}" alt=""><span><strong>${esc(d.data.name)}</strong></span></button>`,
             )
             .join("")
         : q
