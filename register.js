@@ -2,6 +2,18 @@
   const {data:{session}}=await sb.auth.getSession();
   if(session){location.href='main.html';return;}
   const addrPicker=await initAddressPicker('','addressBox').catch(e=>{showMessage('message',e.message);return null;});
+  const birth=birthDateInput('birthBox',{label:'วันเดือนปีเกิด',required:true});
+  const fatherBirth=optionalBirthDate('fatherBirthBox',{toggleLabel:'วันเดือนปีเกิดของบิดา',label:'วันเกิดของบิดา'});
+  const motherBirth=optionalBirthDate('motherBirthBox',{toggleLabel:'วันเดือนปีเกิดของมารดา',label:'วันเกิดของมารดา'});
+  const kids=childrenEditor('childrenBox');
+  // อ่านและตรวจวันเกิด/บุตรธิดาจากฟอร์ม
+  const pick=r=>{if(r.error){$(r.focus).focus();throw new Error(r.error);}return r;};
+  const readFamily=()=>({birth_date:pick(birth.get()).value,father_birth_date:pick(fatherBirth.get()).value,mother_birth_date:pick(motherBirth.get()).value,kids:pick(kids.get())});
+  // ข้อมูลเดิม (Claim) ไม่ได้บันทึกชื่อพ่อแม่จากฟอร์ม จึงไม่บันทึกวันเกิดพ่อแม่ด้วย
+  const saveFamily=async(personId,f,isNew)=>{
+    await saveBirthDates(personId,isNew?{birth_date:f.birth_date,father_birth_date:f.father_birth_date,mother_birth_date:f.mother_birth_date}:{birth_date:f.birth_date});
+    await saveChildren(personId,f.kids);
+  };
 
   $('avatar').addEventListener('change',()=>{
     const f=$('avatar').files[0];
@@ -20,8 +32,10 @@
       try {
         const code=$('claimCode').value.trim();
         if(!code) throw new Error('กรุณากรอกรหัสยืนยันจากผู้ดูแล');
-        const {error}=await sb.rpc('claim_existing_person_by_name',{p_claim_code:code,p_full_name:pendingFullName});
+        const family=readFamily();
+        const {data:personId,error}=await sb.rpc('claim_existing_person_by_name',{p_claim_code:code,p_full_name:pendingFullName});
         if(error) throw error;
+        await saveFamily(personId,family,false);
         location.href='main.html';
       } catch(err) { showMessage('message',err.message||'เชื่อมข้อมูลไม่สำเร็จ'); }
       finally { btn.disabled=false; }
@@ -40,13 +54,20 @@
       if(firstName.length<2||/\s/.test(firstName)) throw new Error('กรุณากรอกชื่อจริงเป็นคำเดียว (ไม่ต้องใส่นามสกุล)');
       if(lastName.length<2) throw new Error('กรุณากรอกนามสกุลให้ถูกต้อง');
       if(!validPhone(phone)) throw new Error('กรุณากรอกเบอร์โทรศัพท์ให้ถูกต้อง เช่น 0812345678');
+      const family=readFamily();
+      // รหัสผ่าน = วันเดือนปีเกิด DDMMYYYY (ปี พ.ศ.) ส่งให้ Supabase Auth เก็บแบบ hash เท่านั้น
+      const password=birthPassword(family.birth_date);
 
       // Username (ชื่อจริง) + เบอร์โทร ถูกแปลงเป็นอีเมลภายในสำหรับ Supabase Auth
       const email=await accountEmail(firstName,phone);
-      let {data:authData,error:authError}=await sb.auth.signUp({email,password:phone,options:{data:{username:firstName,first_name:firstName,last_name:lastName}}});
+      let {data:authData,error:authError}=await sb.auth.signUp({email,password,options:{data:{username:firstName,first_name:firstName,last_name:lastName}}});
       if(authError&&/already registered/i.test(authError.message)){
-        // มีบัญชีใน Auth อยู่แล้ว (เช่น ลบแถวใน person แต่ไม่ได้ลบผู้ใช้ใน Auth) → ลองเข้าสู่ระบบด้วยชื่อจริง+เบอร์เดียวกัน
-        const {data:signIn,error:signInError}=await sb.auth.signInWithPassword({email,password:phone});
+        // มีบัญชีใน Auth อยู่แล้ว (เช่น ลบแถวใน person แต่ไม่ได้ลบผู้ใช้ใน Auth) → ลองเข้าสู่ระบบด้วยวันเกิด หรือเบอร์โทร (บัญชีระบบเดิม)
+        let {data:signIn,error:signInError}=await sb.auth.signInWithPassword({email,password});
+        if(signInError){
+          ({data:signIn,error:signInError}=await sb.auth.signInWithPassword({email,password:phone}));
+          if(!signInError&&!(await currentPerson())) await sb.auth.updateUser({password});
+        }
         if(signInError||!signIn.session) throw new Error('ชื่อจริงและเบอร์โทรนี้มีบัญชีอยู่แล้ว กรุณาไปหน้าเข้าสู่ระบบ');
         if(await currentPerson()){await sb.auth.signOut();throw new Error('ชื่อจริงและเบอร์โทรนี้มีบัญชีอยู่แล้ว กรุณาไปหน้าเข้าสู่ระบบ');}
         authData=signIn;authError=null;   // บัญชีค้างที่ไม่มีข้อมูลบุคคล → สร้างข้อมูลบุคคลต่อบนบัญชีเดิม
@@ -75,6 +96,7 @@
         const {data,error}=await sb.rpc('claim_existing_person_by_name',{p_claim_code:claimCode,p_full_name:name});
         if(error) throw error;
         personId=data;
+        await saveFamily(personId,family,false);
       } else {
         // No existing person with this normalized name: create a new record for this account.
         // เก็บชื่อพ่อแม่เป็นข้อความ ฐานข้อมูลจะเชื่อมเป็นลิงก์ให้เมื่อบุคคลนั้นมีในระบบ (04-relation-names.sql)
@@ -82,6 +104,7 @@
         const {data:person,error:personError}=await sb.from('person').insert({full_name:name,phone,gender,...addr.values,father_name,mother_name,auth_user_id:authData.user.id}).select('id').single();
         if(personError) throw personError;
         personId=person.id;
+        await saveFamily(personId,family,true);
       }
 
       const file=$('avatar').files[0];
