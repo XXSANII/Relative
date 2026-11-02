@@ -152,10 +152,10 @@
         throw new Error("ชื่อพ่อ แม่ หรือคู่สมรส ต้องไม่ใช่ชื่อของตัวเอง");
       const family = readFamily();
       // รหัสผ่าน = วันเดือนปีเกิด DDMMYYYY (ปี พ.ศ.) ส่งให้ Supabase Auth เก็บแบบ hash เท่านั้น
-      // เสียชีวิตแล้วและไม่มีวันเกิด → รหัสผ่านสุ่ม (เข้าสู่ระบบซ้ำไม่ได้)
+      // ไม่ได้กรอกวันเกิด (เช่น เสียชีวิตแล้ว) → ใช้รหัสผ่าน 00000000
       const password = family.birth_date
         ? birthPassword(family.birth_date)
-        : randomPassword();
+        : NO_BIRTH_PASSWORD;
 
       // Username (ชื่อจริง) + เบอร์โทร ถูกแปลงเป็นอีเมลภายในสำหรับ Supabase Auth
       const email = await accountEmail(firstName, phone, lastName);

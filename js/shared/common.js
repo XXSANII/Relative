@@ -55,12 +55,8 @@ async function accountEmail(firstName, phone, lastName) {
   const hex = await sha256Hex(seed);
   return `f-${hex.slice(0, 60)}@example.com`;
 }
-// รหัสผ่านสุ่มสำหรับบัญชีที่ไม่มีวันเกิด (กรณีเสียชีวิตแล้ว) ไม่มีใครรู้รหัสนี้ บัญชีจึงเข้าสู่ระบบซ้ำไม่ได้
-function randomPassword() {
-  return [...crypto.getRandomValues(new Uint8Array(24))]
-    .map((b) => b.toString(16).padStart(2, "0"))
-    .join("");
-}
+// รหัสผ่านของบัญชีที่ไม่ได้กรอกวันเดือนปีเกิด
+const NO_BIRTH_PASSWORD = "00000000";
 // รูปแบบเดิม (V4): hash ของชื่อ-นามสกุล ใช้สำหรับบัญชีที่สมัครไว้ก่อนเปลี่ยนระบบ
 async function usernameEmail(username) {
   const hex = await sha256Hex(normalize(username));
