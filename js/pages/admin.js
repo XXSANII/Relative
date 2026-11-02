@@ -82,7 +82,7 @@
                      <button data-act="remove" class="danger">เอาออก</button>`
                   : `<button data-act="edit" class="ghost">แก้ไข</button>
                      <button data-act="promote" class="ghost">เลื่อนเป็นสมาชิกหลัก</button>
-                     ${m.manual ? '<button data-act="unlink" class="danger">เอาออก</button>' : ""}`
+                     <button data-act="unlink" class="danger">เอาออก</button>`
               }</div></div>`;
           })
           .join("")
@@ -162,12 +162,12 @@
       if (act === "edit") return openEdit(id, name);
       if (act === "move") return openMove(id, name);
       if (act === "remove") {
-        if (!confirm(`เอา ${name} ออกจากตระกูล ${clanName(clanId)}?\n(ไม่ลบบัญชีหรือข้อมูลของเขา)`)) return;
+        if (!confirm(`เอา ${name} ออกจากตระกูล ${clanName(clanId)}?\n(ไม่ลบบัญชีหรือข้อมูลของเขา และจะไม่ถูกเชื่อมกลับมาเป็นผู้เชื่อมโยงเอง)`)) return;
         await call("clan_remove_member", { p_clan_id: clanId, p_person_id: id });
       } else if (act === "admin" || act === "unadmin") {
         await call("clan_set_admin", { p_clan_id: clanId, p_person_id: id, p_on: act === "admin" });
       } else if (act === "unlink") {
-        if (!confirm(`เอา ${name} ออกจากผู้เชื่อมโยงของตระกูล ${clanName(clanId)}?`)) return;
+        if (!confirm(`เอา ${name} ออกจากผู้เชื่อมโยงของตระกูล ${clanName(clanId)}?\n(ความสัมพันธ์ในข้อมูลของเขาไม่เปลี่ยน แค่ไม่แสดงในตระกูลนี้)`)) return;
         await call("clan_remove_linked", { p_clan_id: clanId, p_person_id: id });
       } else if (act === "promote") {
         await call("clan_add_member", { p_clan_id: clanId, p_person_id: id });
