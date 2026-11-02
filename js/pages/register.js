@@ -10,10 +10,9 @@
     showMessage("message", e.message);
     return null;
   });
-  const birth = birthDateInput("birthBox", {
-    label: "วันเดือนปีเกิด",
-    required: true,
-  });
+  // วันเกิดบังคับ เว้นแต่ติ๊กเสียชีวิตแล้ว (ตรวจใน readFamily)
+  const birth = birthDateInput("birthBox", { label: "วันเดือนปีเกิด" });
+  bindBirthRequired("birthBox", "deceased");
   const fatherBirth = optionalBirthDate("fatherBirthBox", {
     toggleLabel: "วันเดือนปีเกิดของบิดา",
     label: "วันเกิดของบิดา",
@@ -34,7 +33,12 @@
     return r;
   };
   const readFamily = () => ({
-    birth_date: pick(birth.get()).value,
+    birth_date: (() => {
+      const v = pick(birth.get()).value;
+      pick(checkBirthOrDeceased("birthBox", "deceased", v));
+      return v;
+    })(),
+    deceased: $("deceased").checked,
     father_birth_date: pick(fatherBirth.get()).value,
     mother_birth_date: pick(motherBirth.get()).value,
     kids: pick(kids.get()),
@@ -59,8 +63,9 @@
     await saveChildren(personId, f.kids);
     if (f.spouse_phone) await savePrivate(personId, { spouse_phone: f.spouse_phone });
     // ข้อมูลเดิม (Claim): บันทึกคำนำหน้า/ชื่อเล่นที่กรอกตอนสมัครลงแถวเดิม
-    if (!isNew && (f.nickname || f.prefix)) {
+    if (!isNew && (f.nickname || f.prefix || f.deceased)) {
       const patch = {};
+      if (f.deceased) patch.deceased = true;
       if (f.nickname) patch.nickname = f.nickname;
       if (f.prefix) patch.prefix = f.prefix;
       const { error } = await sb.from("person").update(patch).eq("id", personId);
@@ -133,7 +138,7 @@
       if (firstName.length < 2 || /\s/.test(firstName))
         throw new Error("กรุณากรอกชื่อจริงเป็นคำเดียว (ไม่ต้องใส่นามสกุล)");
       if (lastName.length < 2) throw new Error("กรุณากรอกนามสกุลให้ถูกต้อง");
-      if (!validPhone(phone))
+      if (phone && !validPhone(phone))
         throw new Error("กรุณากรอกเบอร์โทรศัพท์ให้ถูกต้อง เช่น 0812345678");
       const rel = (k) => $(k).value.trim().replace(/\s+/g, " ") || null;
       const father_name = rel("father"),
@@ -147,10 +152,13 @@
         throw new Error("ชื่อพ่อ แม่ หรือคู่สมรส ต้องไม่ใช่ชื่อของตัวเอง");
       const family = readFamily();
       // รหัสผ่าน = วันเดือนปีเกิด DDMMYYYY (ปี พ.ศ.) ส่งให้ Supabase Auth เก็บแบบ hash เท่านั้น
-      const password = birthPassword(family.birth_date);
+      // เสียชีวิตแล้วและไม่มีวันเกิด → รหัสผ่านสุ่ม (เข้าสู่ระบบซ้ำไม่ได้)
+      const password = family.birth_date
+        ? birthPassword(family.birth_date)
+        : randomPassword();
 
       // Username (ชื่อจริง) + เบอร์โทร ถูกแปลงเป็นอีเมลภายในสำหรับ Supabase Auth
-      const email = await accountEmail(firstName, phone);
+      const email = await accountEmail(firstName, phone, lastName);
       let { data: authData, error: authError } = await sb.auth.signUp({
         email,
         password,
@@ -166,7 +174,7 @@
         // มีบัญชีใน Auth อยู่แล้ว (เช่น ลบแถวใน person แต่ไม่ได้ลบผู้ใช้ใน Auth) → ลองเข้าสู่ระบบด้วยวันเกิด หรือเบอร์โทร (บัญชีระบบเดิม)
         let { data: signIn, error: signInError } =
           await sb.auth.signInWithPassword({ email, password });
-        if (signInError) {
+        if (signInError && phone) {
           ({ data: signIn, error: signInError } =
             await sb.auth.signInWithPassword({ email, password: phone }));
           if (!signInError && !(await currentPerson()))
@@ -232,7 +240,8 @@
             full_name: name,
             prefix: family.prefix,
             nickname: family.nickname,
-            phone,
+            phone: phone || null,
+            deceased: family.deceased,
             gender,
             ...addr.values,
             father_name,

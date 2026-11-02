@@ -235,6 +235,25 @@ function childrenEditor(boxId) {
   };
 }
 
+// วันเกิดบังคับกรอก เว้นแต่ติ๊กว่าเสียชีวิตแล้ว: สลับเครื่องหมาย * ที่ป้ายของช่องวันเกิดตามช่องติ๊ก
+function bindBirthRequired(boxId, deceasedId) {
+  const label = $(boxId).querySelector("label");
+  const base = label.textContent.replace(/\s*\*$/, "");
+  const sync = () => {
+    label.textContent = $(deceasedId).checked ? base : base + " *";
+  };
+  $(deceasedId).addEventListener("change", sync);
+  sync();
+}
+// ตรวจว่ามีวันเกิดหรือติ๊กเสียชีวิตแล้ว: คืน {error, focus} ถ้าไม่ผ่าน
+function checkBirthOrDeceased(boxId, deceasedId, value) {
+  if (value || $(deceasedId).checked) return {};
+  return {
+    error: "กรุณากรอกวันเดือนปีเกิด หรือติ๊กว่าเสียชีวิตแล้ว",
+    focus: $(boxId).querySelector("select").id,
+  };
+}
+
 // สวิตช์สถานะมีชีวิตของพ่อ/แม่: เปิด = มีชีวิต, ปิด = เสียชีวิต
 // get(hasName) คืน true/false หรือ null เมื่อไม่ได้กรอกชื่อ (ยังไม่มีข้อมูลพ่อ/แม่ จึงไม่ระบุสถานะ)
 function aliveSwitch(boxId, who) {

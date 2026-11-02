@@ -129,6 +129,7 @@
       $("e_phone").value = person.phone || "";
       $("e_line").value = person.line_id || "";
       $("e_deceased").checked = !!person.deceased;
+      $("e_deceased").dispatchEvent(new Event("change"));
       $("e_gender").value = person.gender || "";
       if (!addrPicker)
         addrPicker = await initAddressPicker("e_", "e_addressBox");
@@ -139,6 +140,7 @@
       $("e_spousePhone").value = spousePhone || "";
       if (!birthIn) {
         birthIn = birthDateInput("e_birthBox", { label: "วันเดือนปีเกิด" });
+        bindBirthRequired("e_birthBox", "e_deceased");
         fatherBirth = optionalBirthDate("e_fatherBirthBox", {
           toggleLabel: "วันเดือนปีเกิดของบิดา",
           label: "วันเกิดของบิดา",
@@ -227,7 +229,7 @@
         if (first.length < 2 || /\s/.test(first))
           throw new Error("กรุณากรอกชื่อจริงเป็นคำเดียว (ไม่ต้องใส่นามสกุล)");
         if (last.length < 2) throw new Error("กรุณากรอกนามสกุลให้ถูกต้อง");
-        if (!validPhone(phone))
+        if (phone && !validPhone(phone))
           throw new Error("กรุณากรอกเบอร์โทรศัพท์ให้ถูกต้อง เช่น 0812345678");
         const lineId = $("e_line").value.trim() || null;
         if (lineId && !validLineId(lineId))
@@ -250,6 +252,7 @@
           mother_birth_date = pick(motherBirth.get()).value,
           kids = pick(kidsEd.get()),
           spouse_phone = pick(readSpousePhone("e_spousePhone")).value;
+        pick(checkBirthOrDeceased("e_birthBox", "e_deceased", birth_date));
         // เปลี่ยนรหัสผ่านเป็นวันเกิดเฉพาะเมื่อเลือกและยืนยันเท่านั้น (แก้วันเกิดอย่างเดียวไม่เปลี่ยนรหัสผ่าน)
         const resetPwd = own && $("e_resetPwd").checked;
         if (resetPwd && !birth_date)
@@ -266,7 +269,7 @@
           prefix: $("e_prefix").value.trim().replace(/\s+/g, " ") || null,
           full_name: name,
           nickname: $("e_nickname").value.trim().replace(/\s+/g, " ") || null,
-          phone,
+          phone: phone || null,
           line_id: lineId,
           deceased: $("e_deceased").checked,
           gender: $("e_gender").value || null,
@@ -289,7 +292,7 @@
           const {
             data: { user },
           } = await sb.auth.getUser();
-          const email = await accountEmail(first, phone),
+          const email = await accountEmail(first, phone, last),
             auth = {};
           if (user.email !== email) {
             auth.email = email;

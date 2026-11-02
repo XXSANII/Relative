@@ -74,19 +74,22 @@
             maxlength="60"
           /><label for="nickname">ชื่อเล่น</label
           ><input id="nickname" maxlength="40" autocomplete="nickname" />
+          <label class="check" for="deceased"
+            ><input type="checkbox" id="deceased" /><span
+              >เสียชีวิตแล้ว (ไม่ต้องกรอกวันเดือนปีเกิด)</span
+            ></label
+          >
           <div id="birthBox"></div>
           <p class="hint">
             ใช้สร้างรหัสผ่านและคำนวณอายุ หน้าข้อมูลสมาชิกแสดงเฉพาะอายุ
             ไม่แสดงวันเกิดจริง
           </p>
-          <label for="phone">เบอร์โทรศัพท์ *</label
+          <label for="phone">เบอร์โทรศัพท์ (ไม่บังคับ)</label
           ><input
             id="phone"
-            required
             type="tel"
             autocomplete="tel"
             placeholder="เช่น 0812345678"
-            minlength="8"
             maxlength="20"
           /><label for="gender">เพศ</label
           ><select id="gender">
