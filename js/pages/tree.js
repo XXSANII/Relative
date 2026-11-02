@@ -112,6 +112,7 @@
         .style("animation-delay", (d, i) => `${Math.min(i * 35, 700)}ms`)
         .attr("transform", (d) => `translate(${d.x},${d.y})`)
         .classed("locked", (d) => !d.data.canOpen)
+        .classed("linked", (d) => !d.data.isMember) // ผู้เชื่อมโยง: ขอบประ แยกจากสมาชิกหลัก
         .on("click", (e, d) => {
           if (d.data.canOpen) location.href = `profile.html?id=${d.id}`;
         });
@@ -179,11 +180,7 @@
     const render = (animate, mode) => {
       const key = viewAll ? "all" : current;
       if (shownKey !== key) {
-        draw(
-          viewAll
-            ? connected.filter((d) => d.data.isMember) // ดูทั้งหมด = เฉพาะสมาชิกหลักของตระกูลนี้
-            : relatedItems(connected, current),
-        );
+        draw(viewAll ? connected : relatedItems(connected, current));
         shownKey = key;
       }
       info.textContent = viewAll
@@ -207,8 +204,6 @@
     // ค้นหาจากชื่อหรือชื่อเล่น แสดงผลลัพธ์เฉพาะเมื่อพิมพ์ (เหมือนหน้า Home)
     // โหมดเฉพาะที่เกี่ยวข้อง: วาดใหม่เฉพาะคนที่เกี่ยวข้อง / โหมดดูทั้งหมด: คงภาพรวมแล้วชี้ตำแหน่งคนนั้น
     const pick = (id) => {
-      // คนนอกตระกูล (ผู้เชื่อมโยง) ไม่อยู่ในโหมดดูทั้งหมด จึงสลับกลับเป็นโหมดเฉพาะที่เกี่ยวข้องให้
-      if (viewAll && !byId.get(id).data.isMember) setViewAll(false);
       current = id;
       search.value = byId.get(id).data.name;
       results.innerHTML = "";
