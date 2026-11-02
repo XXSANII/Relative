@@ -86,14 +86,30 @@
           .join("")
       : '<p class="muted">ยังไม่มีสมาชิก</p>';
   };
-  const refresh = () => Promise.all([loadRequests(), loadMembers()]);
+  const loadGrants = async () => {
+    if (clanId == null) {
+      $("grants").innerHTML = "";
+      return;
+    }
+    const list = await call("clan_view_grants_list", { p_clan_id: clanId });
+    $("grants").innerHTML = list.length
+      ? list
+          .map(
+            (g) => `<div class="member-row" data-grant="${g.person_id}">
+              <div class="member-info"><strong>${esc(displayName(g))}</strong></div>
+              <div class="member-actions"><button data-act="revoke" class="danger">เพิกถอน</button></div></div>`,
+          )
+          .join("")
+      : '<p class="muted">ยังไม่มีใครได้รับสิทธิ์ดูจากภายนอกตระกูล</p>';
+  };
+  const refresh = () => Promise.all([loadRequests(), loadMembers(), loadGrants()]);
 
   if (!(await loadClans())) return;
   await run(refresh);
 
   $("clanSelect").addEventListener("change", () => {
     clanId = Number($("clanSelect").value);
-    run(loadMembers);
+    run(() => Promise.all([loadMembers(), loadGrants()]));
   });
   $("createClanBtn").addEventListener("click", () =>
     run(async () => {
@@ -195,6 +211,52 @@
       await call("clan_add_member", { p_clan_id: clanId, p_person_id: id });
       await refresh();
       say("เพิ่มสมาชิกแล้ว", "success");
+    });
+  });
+
+  // สิทธิ์ดูต้นไม้: ค้นหาแล้วอนุญาต / เพิกถอน
+  let gTimer;
+  $("grantSearch").addEventListener("input", () => {
+    clearTimeout(gTimer);
+    gTimer = setTimeout(
+      () =>
+        run(async () => {
+          const q = $("grantSearch").value.trim();
+          if (q.length < 2) {
+            $("grantResults").innerHTML = "";
+            return;
+          }
+          const list = await call("clan_search_people", { p_q: q });
+          $("grantResults").innerHTML = list.length
+            ? list
+                .map(
+                  (x) =>
+                    `<div class="member-row" data-grantadd="${x.person_id}"><div class="member-info"><strong>${esc(displayName(x))}</strong></div><div class="member-actions"><button data-act="grant" class="ghost">อนุญาตให้ดู</button></div></div>`,
+                )
+                .join("")
+            : '<p class="muted">ไม่พบรายชื่อที่ตรงกัน</p>';
+        }),
+      250,
+    );
+  });
+  $("grantResults").addEventListener("click", (e) => {
+    const id = Number(e.target.closest("[data-grantadd]")?.dataset.grantadd);
+    if (!id || !e.target.closest("[data-act]")) return;
+    run(async () => {
+      await call("clan_view_grant_set", { p_clan_id: clanId, p_person_id: id, p_on: true });
+      $("grantSearch").value = "";
+      $("grantResults").innerHTML = "";
+      await loadGrants();
+      say("อนุญาตแล้ว", "success");
+    });
+  });
+  $("grants").addEventListener("click", (e) => {
+    const id = Number(e.target.closest("[data-grant]")?.dataset.grant);
+    if (!id || !e.target.closest("[data-act]")) return;
+    run(async () => {
+      await call("clan_view_grant_set", { p_clan_id: clanId, p_person_id: id, p_on: false });
+      await loadGrants();
+      say("เพิกถอนแล้ว", "success");
     });
   });
 

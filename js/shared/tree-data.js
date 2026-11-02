@@ -71,6 +71,7 @@ function buildTreeData({ people = [], child_links = [] }) {
         avatar: p.avatar_path ? avatarUrl(p.avatar_path) : "",
         age: p.age ?? null,
         deceased: !!p.deceased,
+        canOpen: p.can_open !== false,
       },
       rels: {
         parents: arr(parents, id),

@@ -996,3 +996,7 @@ dialog::backdrop {
     font-size: 1.25rem;
   }
 }
+
+.tree-canvas .node.locked {
+  cursor: default;
+}

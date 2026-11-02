@@ -6,7 +6,33 @@
       return;
     }
     $("profileBtn").onclick = () => (location.href = `profile.html?id=${me.id}`);
-    const { data: payload, error } = await sb.rpc("family_tree_data");
+    // แผนผังแยกตามตระกูล: ?clan=<id> (ว่าง = ครอบครัวสายตรงของฉัน) ตัวเลือกมีเฉพาะตระกูลที่ดูได้
+    const { data: clanList, error: clanError } = await sb.rpc("tree_clans");
+    if (clanError) throw clanError;
+    const params = new URLSearchParams(location.search);
+    const asked = params.get("clan");
+    const clan = (clanList || []).find((c) => String(c.id) === asked)
+      ? Number(asked)
+      : asked === ""
+        ? null
+        : ((clanList || []).find((c) => c.kind === "member") || (clanList || [])[0])?.id ?? null;
+    const sel = $("clanSelect");
+    sel.innerHTML =
+      '<option value="">ครอบครัวสายตรงของฉัน</option>' +
+      (clanList || [])
+        .map(
+          (c) =>
+            `<option value="${c.id}">ตระกูล ${esc(c.name)}${c.kind === "granted" ? " (ได้รับสิทธิ์ดู)" : ""}</option>`,
+        )
+        .join("");
+    sel.value = clan ?? "";
+    $("clanBar").hidden = false;
+    sel.addEventListener("change", () => {
+      location.search = `?clan=${sel.value}`;
+    });
+    const { data: payload, error } = await sb.rpc("family_tree_data", {
+      p_clan_id: clan,
+    });
     if (error) throw error;
     const { connected } = buildTreeData(payload || {});
     if (connected.length < 2) {
@@ -85,8 +111,9 @@
         .attr("class", "node")
         .style("animation-delay", (d, i) => `${Math.min(i * 35, 700)}ms`)
         .attr("transform", (d) => `translate(${d.x},${d.y})`)
+        .classed("locked", (d) => !d.data.canOpen)
         .on("click", (e, d) => {
-          location.href = `profile.html?id=${d.id}`;
+          if (d.data.canOpen) location.href = `profile.html?id=${d.id}`;
         });
       cards
         .append("rect")
