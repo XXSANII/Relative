@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="th">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+    <title>จัดการตระกูล | ทะเบียนเครือญาติ</title>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <header class="banner">
+      <div class="wrap">
+        <a class="brand" href="main.html">ทะเบียนเครือญาติ</a
+        ><button id="homeBtn" class="navbtn">หน้า Home</button
+        ><a class="navbtn" href="tree.html">ต้นไม้ครอบครัว</a
+        ><button id="logoutBtn" class="navbtn">ออกจากระบบ</button>
+      </div>
+    </header>
+    <main class="wrap">
+      <section class="card">
+        <h1>🌳 จัดการตระกูล</h1>
+        <p class="muted">
+          จัดการสมาชิกและคำขอได้เฉพาะตระกูลที่คุณเป็นผู้ดูแล
+        </p>
+        <label for="clanSelect">ตระกูล</label>
+        <select id="clanSelect"></select>
+        <div id="superTools" class="actions" hidden>
+          <button id="createClanBtn" class="ghost">+ สร้างตระกูลใหม่</button
+          ><button id="renameClanBtn" class="ghost">เปลี่ยนชื่อตระกูลนี้</button>
+        </div>
+        <div id="message" hidden></div>
+      </section>
+
+      <section class="card" id="requestsCard" hidden>
+        <h2>📨 คำขอที่รออนุมัติ</h2>
+        <div id="requests"></div>
+      </section>
+
+      <section class="card">
+        <h2>👥 สมาชิก</h2>
+        <p class="hint">
+          สมาชิกหลักคือคนในตระกูลนี้ ส่วนผู้เชื่อมโยงคือคนต่างตระกูลที่ต่อกันทางพ่อแม่/คู่สมรส/บุตรธิดา
+          (เห็นเฉพาะในแผนผัง)
+        </p>
+        <div id="members"></div>
+        <h3 class="subhead">เพิ่มสมาชิก</h3>
+        <input id="addSearch" type="search" placeholder="พิมพ์ชื่อเพื่อค้นหา" autocomplete="off" />
+        <div id="addResults" class="results"></div>
+      </section>
+    </main>
+
+    <dialog id="editDialog">
+      <form id="editForm" method="dialog">
+        <h2 id="editTitle">แก้ไขข้อมูล</h2>
+        <p class="hint">
+          ชื่อจริงใช้เป็น Username ของเจ้าของบัญชี ถ้าแก้ชื่อ เขาต้องเข้าสู่ระบบด้วยชื่อใหม่
+          วันเกิดที่ใส่ใหม่ไม่เปลี่ยนรหัสผ่านของเขา
+        </p>
+        <div class="form-grid">
+          <label for="f_prefix">คำนำหน้า</label><input id="f_prefix" maxlength="20" />
+          <label for="f_full_name">ชื่อ-นามสกุล</label><input id="f_full_name" maxlength="120" />
+          <label for="f_nickname">ชื่อเล่น</label><input id="f_nickname" maxlength="40" />
+          <label for="f_gender">เพศ</label>
+          <select id="f_gender">
+            <option value="">ไม่ระบุ</option>
+            <option value="male">ชาย</option>
+            <option value="female">หญิง</option>
+            <option value="other">อื่น ๆ</option>
+          </select>
+          <label for="f_birth_date">วันเกิด (ค.ศ.) ใส่เมื่อต้องการแก้เท่านั้น</label>
+          <input id="f_birth_date" type="date" />
+          <label class="check" for="f_deceased"
+            ><input type="checkbox" id="f_deceased" /><span>เสียชีวิตแล้ว</span></label
+          >
+          <label for="f_phone">เบอร์โทร</label><input id="f_phone" type="tel" maxlength="20" />
+          <label for="f_line_id">LINE ID</label><input id="f_line_id" maxlength="20" />
+          <label for="f_father_name">ชื่อบิดา</label><input id="f_father_name" />
+          <label for="f_mother_name">ชื่อมารดา</label><input id="f_mother_name" />
+          <label for="f_spouse_name">ชื่อคู่สมรส</label><input id="f_spouse_name" />
+          <label for="f_house_no">บ้านเลขที่</label><input id="f_house_no" />
+          <label for="f_road">ถนน</label><input id="f_road" />
+          <label for="f_subdistrict">ตำบล/แขวง</label><input id="f_subdistrict" />
+          <label for="f_district">อำเภอ/เขต</label><input id="f_district" />
+          <label for="f_province">จังหวัด</label><input id="f_province" />
+          <label for="f_postal_code">รหัสไปรษณีย์</label
+          ><input id="f_postal_code" inputmode="numeric" maxlength="5" />
+        </div>
+        <div id="editMessage" hidden></div>
+        <div class="actions">
+          <button id="editSave" type="submit">บันทึก</button
+          ><button id="editCancel" type="button" class="ghost">ยกเลิก</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog id="moveDialog">
+      <form id="moveForm" method="dialog">
+        <h2>ย้ายตระกูล</h2>
+        <p id="moveWho" class="muted"></p>
+        <label for="moveTo">ย้ายไปตระกูล</label>
+        <select id="moveTo"></select>
+        <p class="hint">ย้ายได้เฉพาะตระกูลที่คุณเป็นผู้ดูแลด้วย</p>
+        <div class="actions">
+          <button id="moveSave" type="submit">ย้าย</button
+          ><button id="moveCancel" type="button" class="ghost">ยกเลิก</button>
+        </div>
+      </form>
+    </dialog>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/config.js"></script>
+    <script src="js/shared/common.js"></script>
+    <script src="js/pages/admin.js"></script>
+  </body>
+</html>

@@ -909,3 +909,90 @@ button:disabled {
     stroke-width: 3;
   }
 }
+
+/* ===== ผู้ดูแลตระกูล: ไอคอนต้นไม้เป็นทางเข้า (เห็นเฉพาะผู้ดูแล) ===== */
+.banner .wrap.has-admin::before {
+  display: none;
+}
+.admin-tree {
+  font-size: 1.35rem;
+  line-height: 1;
+  text-decoration: none;
+  margin-right: -2px;
+  opacity: 0.85;
+  transition:
+    transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+    opacity 0.2s;
+}
+.admin-tree:hover,
+.admin-tree:focus-visible {
+  opacity: 1;
+  transform: rotate(-14deg) scale(1.2);
+}
+.member-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+.member-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.member-info a {
+  color: inherit;
+  text-decoration: none;
+}
+.member-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.member-actions button {
+  width: auto;
+  margin: 0;
+  padding: 6px 12px;
+  font-size: 0.85rem;
+  border-radius: 12px;
+}
+.badge {
+  display: inline-block;
+  padding: 1px 9px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #fff;
+  background: linear-gradient(135deg, var(--primary), var(--primary-2));
+}
+.badge.soft {
+  background: var(--soft);
+  color: var(--primary);
+}
+.badge.admin {
+  background: var(--accent);
+}
+dialog {
+  width: min(560px, calc(100% - 28px));
+  max-height: 88vh;
+  padding: var(--pad);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--card-solid);
+  color: var(--fg);
+  box-shadow: var(--shadow);
+}
+dialog::backdrop {
+  background: rgba(15, 13, 28, 0.55);
+}
+@media (max-width: 480px) {
+  .admin-tree {
+    flex: none;
+    padding: 0 6px 0 8px;
+    font-size: 1.25rem;
+  }
+}

@@ -109,3 +109,28 @@ function setNav() {
   if (out) out.addEventListener("click", signOut);
 }
 setNav();
+
+// ไอคอนต้นไม้ในแถบเมนูเป็นทางเข้าหน้าผู้ดูแล แสดงเฉพาะผู้ดูแลตระกูล/ผู้ดูแลสูงสุด (คนอื่นไม่เห็นอะไรเพิ่ม)
+async function initAdminLink() {
+  const wrap = document.querySelector(".banner .wrap");
+  if (!wrap) return;
+  try {
+    const {
+      data: { session },
+    } = await sb.auth.getSession();
+    if (!session) return;
+    const { data } = await sb.rpc("my_clans");
+    if (!data || !(data.super || (data.clans || []).some((c) => c.is_admin))) return;
+    const a = document.createElement("a");
+    a.className = "admin-tree";
+    a.href = "admin.html";
+    a.textContent = "🌳";
+    a.title = "จัดการตระกูล";
+    a.setAttribute("aria-label", "จัดการตระกูล");
+    wrap.prepend(a);
+    wrap.classList.add("has-admin");
+  } catch {
+    /* ยังไม่ได้รัน sql/16 หรือเครือข่ายขัดข้อง: ไม่แสดงไอคอน */
+  }
+}
+initAdminLink();
