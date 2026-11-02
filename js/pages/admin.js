@@ -80,7 +80,9 @@
                      <button data-act="move" class="ghost">ย้าย</button>
                      ${m.has_account ? `<button data-act="${m.is_admin ? "unadmin" : "admin"}" class="ghost">${m.is_admin ? "ถอดผู้ดูแล" : "ตั้งเป็นผู้ดูแล"}</button>` : ""}
                      <button data-act="remove" class="danger">เอาออก</button>`
-                  : '<button data-act="edit" class="ghost">แก้ไข</button> <button data-act="promote" class="ghost">เลื่อนเป็นสมาชิกหลัก</button>'
+                  : `<button data-act="edit" class="ghost">แก้ไข</button>
+                     <button data-act="promote" class="ghost">เลื่อนเป็นสมาชิกหลัก</button>
+                     ${m.manual ? '<button data-act="unlink" class="danger">เอาออก</button>' : ""}`
               }</div></div>`;
           })
           .join("")
@@ -164,6 +166,9 @@
         await call("clan_remove_member", { p_clan_id: clanId, p_person_id: id });
       } else if (act === "admin" || act === "unadmin") {
         await call("clan_set_admin", { p_clan_id: clanId, p_person_id: id, p_on: act === "admin" });
+      } else if (act === "unlink") {
+        if (!confirm(`เอา ${name} ออกจากผู้เชื่อมโยงของตระกูล ${clanName(clanId)}?`)) return;
+        await call("clan_remove_linked", { p_clan_id: clanId, p_person_id: id });
       } else if (act === "promote") {
         await call("clan_add_member", { p_clan_id: clanId, p_person_id: id });
       }
@@ -196,7 +201,7 @@
             ? data
                 .map(
                   (x) =>
-                    `<div class="member-row" data-add="${x.id}"><div class="member-info"><strong>${esc(displayName(x))}</strong></div><div class="member-actions"><button data-act="add" class="ghost">เพิ่มเป็นสมาชิกหลัก</button></div></div>`,
+                    `<div class="member-row" data-add="${x.id}"><div class="member-info"><strong>${esc(displayName(x))}</strong></div><div class="member-actions"><button data-act="add" class="ghost">เพิ่มเป็นสมาชิกหลัก</button><button data-act="addlinked" class="ghost">เพิ่มเป็นผู้เชื่อมโยง</button></div></div>`,
                 )
                 .join("")
             : '<p class="muted">ไม่พบรายชื่อที่ตรงกัน</p>';
@@ -206,11 +211,16 @@
   });
   $("addResults").addEventListener("click", (e) => {
     const id = Number(e.target.closest("[data-add]")?.dataset.add);
-    if (!id || !e.target.closest("[data-act]")) return;
+    const b = e.target.closest("[data-act]");
+    if (!id || !b) return;
+    const linked = b.dataset.act === "addlinked";
     run(async () => {
-      await call("clan_add_member", { p_clan_id: clanId, p_person_id: id });
+      await call(linked ? "clan_add_linked" : "clan_add_member", {
+        p_clan_id: clanId,
+        p_person_id: id,
+      });
       await refresh();
-      say("เพิ่มสมาชิกแล้ว", "success");
+      say(linked ? "เพิ่มผู้เชื่อมโยงแล้ว" : "เพิ่มสมาชิกแล้ว", "success");
     });
   });
 

@@ -37,7 +37,8 @@
 │   ├── 15-optional-phone.sql          เบอร์โทรไม่บังคับ (person.phone เป็น null ได้)
 │   ├── 16-clans.sql                    ตระกูล + ผู้ดูแล (แทนการเดาวงจากนามสกุล)
 │   ├── 17-clan-tree.sql                แผนผังแยกตามตระกูล + สิทธิ์ดูตระกูลอื่นที่ผู้ดูแลอนุญาต
-│   └── 18-admin-edit-linked.sql        ผู้ดูแลแก้ข้อมูลผู้เชื่อมโยงได้ (เฉพาะฟิลด์พื้นฐาน)
+│   ├── 18-admin-edit-linked.sql        ผู้ดูแลแก้ข้อมูลผู้เชื่อมโยงได้ (เฉพาะฟิลด์พื้นฐาน)
+│   └── 19-manual-linked.sql            ผู้ดูแลเพิ่ม/เอาออกผู้เชื่อมโยงเอง
 └── supabase/                Edge Function `username-auth` (ไม่ได้ใช้และยังไม่ได้ deploy)
 ```
 
@@ -60,6 +61,7 @@
 16. รัน `sql/16-clans.sql` (หลัง 15; เปลี่ยนสิทธิ์อ่านจาก "นามสกุลเดียวกัน" เป็น "ตระกูล" และจัดข้อมูลเดิมเข้าตระกูลตามนามสกุลครั้งเดียว) จากนั้นรันคำสั่งตั้งผู้ดูแลสูงสุดคนแรกท้ายไฟล์ (ยังไม่มีหน้าเว็บจัดการ: ใช้ผ่าน SQL/RPC ไปก่อน)
 17. รัน `sql/17-clan-tree.sql` (หลัง 16; ต้องรันก่อน deploy เว็บเวอร์ชันนี้ เพราะหน้าต้นไม้เรียก `tree_clans` และ `family_tree_data(p_clan_id)` และฟังก์ชันเดิมที่ไม่มีพารามิเตอร์ถูกลบ)
 18. รัน `sql/18-admin-edit-linked.sql` (หลัง 17; ต้องรันก่อน deploy เว็บเวอร์ชันนี้ เพราะหน้า admin เรียก `clan_get_person`)
+19. รัน `sql/19-manual-linked.sql` (หลัง 18; ต้องรันก่อน deploy เว็บเวอร์ชันนี้ เพราะหน้า admin เรียก `clan_add_linked` และ `clan_members_list` ตัวใหม่)
 10. ตรวจว่า RLS บน `person` มี SELECT สำหรับ authenticated และ INSERT/UPDATE/DELETE เฉพาะ `auth_user_id = auth.uid()` เท่านั้น และไม่มี policy anon แบบเปิดกว้างหลงเหลือ
 11. ใน Supabase Auth หากใช้ username ที่แปลงเป็นอีเมลภายใน ให้ปิด Confirm email สำหรับเดโมนี้ มิฉะนั้นต้องทำ flow ยืนยันบัญชีให้ครบก่อนเชื่อมข้อมูล
 12. ตั้ง Storage bucket `family-avatars` เป็น public เพื่อให้ `getPublicUrl()` ใช้ได้ หรือปรับโค้ดเป็น signed URLs และกำหนด Storage policies ให้ปลอดภัย
