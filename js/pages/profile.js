@@ -35,6 +35,7 @@
     );
     if (infoError) throw infoError;
     $("age").textContent = ageText(info?.age);
+    $("deceasedRow").hidden = !person.deceased;
     // มี id = ลงทะเบียนแล้ว กดเข้าไปดูได้ / มีแต่ชื่อ = ยังไม่ได้ลงทะเบียน แสดงเป็นข้อความ
     const linkPerson = async (relId, relName, field, withAge, age, alive) => {
       // alive: true/false = สถานะมีชีวิต/เสียชีวิต (พ่อ/แม่) ; null/undefined = ไม่มีข้อมูล ไม่แสดง
@@ -127,6 +128,7 @@
       $("e_nickname").value = person.nickname || "";
       $("e_phone").value = person.phone || "";
       $("e_line").value = person.line_id || "";
+      $("e_deceased").checked = !!person.deceased;
       $("e_gender").value = person.gender || "";
       if (!addrPicker)
         addrPicker = await initAddressPicker("e_", "e_addressBox");
@@ -266,6 +268,7 @@
           nickname: $("e_nickname").value.trim().replace(/\s+/g, " ") || null,
           phone,
           line_id: lineId,
+          deceased: $("e_deceased").checked,
           gender: $("e_gender").value || null,
           ...addr.values,
           father_name: rel("e_father"),

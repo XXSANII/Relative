@@ -580,6 +580,9 @@ a.navbtn {
 .tree-canvas .card-bg.unknown {
   fill: #5a6170;
 }
+.tree-canvas .card-bg.deceased {
+  fill: #7a7f88;
+}
 .tree-canvas .node.selected .card-bg {
   stroke: #fff;
 }

@@ -53,12 +53,62 @@ function computeTreeLayout(items) {
   const byId = new Map(items.map((d) => [d.id, d]));
   const gen = assignGenerations(items);
 
-  // จัดแถวตามรุ่น แล้วเรียงทั้งแถวตามอายุ
-  const rows = new Map();
+  // 1) หน่วยครอบครัว: คู่สมรสรวมเป็นหน่วยเดียว คนโสดเป็นหน่วยของตัวเอง; สมาชิกในหน่วยเรียงอายุมาก → น้อย
+  const unitOf = new Map();
+  const units = [];
   for (const d of items) {
-    const g = gen.get(d.id);
-    if (!rows.has(g)) rows.set(g, []);
-    rows.get(g).push(d);
+    if (unitOf.has(d.id)) continue;
+    const u = { members: [], parents: new Set(), children: new Set() };
+    const stack = [d.id];
+    unitOf.set(d.id, u);
+    while (stack.length) {
+      const m = byId.get(stack.pop());
+      u.members.push(m);
+      for (const s of m.rels.spouses || []) {
+        if (!byId.has(s) || unitOf.has(s)) continue;
+        unitOf.set(s, u);
+        stack.push(s);
+      }
+    }
+    u.members.sort(compareByAge);
+    units.push(u);
+  }
+  for (const u of units) {
+    for (const m of u.members) {
+      for (const p of m.rels.parents || []) {
+        if (byId.has(p) && unitOf.get(p) !== u) u.parents.add(unitOf.get(p));
+      }
+      for (const c of m.rels.children || []) {
+        if (byId.has(c) && unitOf.get(c) !== u) {
+          u.children.add(unitOf.get(c));
+          unitOf.get(c).parents.add(u);
+        }
+      }
+    }
+  }
+
+  // 2) จัดลำดับหน่วยแบบ depth-first: พ่อแม่คู่ไหนมาก่อน ลูกของคู่นั้นก็มาก่อนลูกของคู่ถัดไป
+  //    ลูกในกลุ่มเดียวกันเรียงอายุมาก → น้อย ทำให้ครอบครัวอยู่ติดกันในทุกรุ่น
+  const cmpUnits = (a, b) => compareByAge(a.members[0], b.members[0]);
+  const order = [];
+  const placed = new Set();
+  const visit = (u) => {
+    if (placed.has(u)) return;
+    placed.add(u);
+    order.push(u);
+    [...u.children].sort(cmpUnits).forEach(visit);
+  };
+  units.filter((u) => u.parents.size === 0).sort(cmpUnits).forEach(visit);
+  units.slice().sort(cmpUnits).forEach(visit); // กรณีข้อมูลวนลูป: ไม่มีหน่วยใดหลุด
+
+  // 3) วางแถวตามรุ่น โดยเรียงตามลำดับ depth-first ข้างบน
+  const rows = new Map();
+  for (const u of order) {
+    for (const m of u.members) {
+      const g = gen.get(m.id);
+      if (!rows.has(g)) rows.set(g, []);
+      rows.get(g).push(m);
+    }
   }
   const genKeys = [...rows.keys()].sort((a, b) => a - b);
   const rowWidth = (n) => n * CARD_W + Math.max(0, n - 1) * GAP_X;
@@ -67,7 +117,7 @@ function computeTreeLayout(items) {
   const nodes = [];
   const pos = new Map();
   for (const g of genKeys) {
-    const row = rows.get(g).sort(compareByAge);
+    const row = rows.get(g);
     const x0 = (maxW - rowWidth(row.length)) / 2;
     row.forEach((d, i) => {
       const node = {

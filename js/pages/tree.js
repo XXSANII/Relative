@@ -66,7 +66,17 @@
       });
     cards
       .append("rect")
-      .attr("class", (d) => `card-bg ${d.data.gender === "F" ? "female" : d.data.gender === "M" ? "male" : "unknown"}`)
+      .attr("class", (d) => {
+        // เสียชีวิตแล้ว = สีเทา; ไม่งั้นใช้สีตามเพศ
+        const kind = d.data.deceased
+          ? "deceased"
+          : d.data.gender === "F"
+            ? "female"
+            : d.data.gender === "M"
+              ? "male"
+              : "unknown";
+        return `card-bg ${kind}`;
+      })
       .attr("width", layout.cardW)
       .attr("height", layout.cardH)
       .attr("rx", 10);

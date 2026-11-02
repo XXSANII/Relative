@@ -28,6 +28,9 @@
           </div>
           <div class="row"><strong>เพศ</strong><span id="gender"></span></div>
           <div class="row"><strong>อายุ</strong><span id="age"></span></div>
+          <div class="row" id="deceasedRow" hidden>
+            <strong>สถานะ</strong><span>เสียชีวิตแล้ว</span>
+          </div>
           <div class="row">
             <strong>เบอร์โทร</strong><span id="phone"></span>
           </div>
@@ -109,7 +112,9 @@
             maxlength="20"
             autocomplete="off"
             placeholder="เช่น somchai_01"
-          /><label for="e_gender">เพศ</label
+          /><label class="check" for="e_deceased"
+            ><input type="checkbox" id="e_deceased" /><span>เสียชีวิตแล้ว (แสดงเป็นสีเทาในต้นไม้ครอบครัว)</span></label
+          ><label for="e_gender">เพศ</label
           ><select id="e_gender">
             <option value="">ไม่ระบุ</option>
             <option value="male">ชาย</option>
