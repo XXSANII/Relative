@@ -33,7 +33,7 @@
 │   ├── 11-family-circles.sql            แยกวงครอบครัว: เห็นเฉพาะนามสกุลเดียวกัน + ญาติที่เชื่อมแล้ว (RLS ของ person, `visible_person_ids()`)
 │   ├── 12-line-contact.sql             ช่องทางติดต่อ LINE ID ในโปรไฟล์
 │   ├── 13-tree-age.sql                 เพิ่มอายุใน family_tree_data() สำหรับเรียงลำดับในหน้าต้นไม้
-│   ├── 14-deceased.sql                 สถานะเสียชีวิต (แสดงเป็นสีเทาในต้นไม้)
+│   ├── 14-deceased.sql                 สถานะเสียชีวิต (แสดง "(เสียชีวิต)" หลังชื่อในต้นไม้)
 │   └── 15-optional-phone.sql          เบอร์โทรไม่บังคับ (person.phone เป็น null ได้)
 └── supabase/                Edge Function `username-auth` (ไม่ได้ใช้และยังไม่ได้ deploy)
 ```

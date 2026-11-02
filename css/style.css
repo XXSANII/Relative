@@ -800,9 +800,6 @@ button:disabled {
 .tree-canvas .card-bg.unknown {
   fill: url(#g-unknown);
 }
-.tree-canvas .card-bg.deceased {
-  fill: url(#g-deceased);
-}
 .tree-canvas .node.selected .card-bg {
   stroke: #fff;
   stroke-width: 3;

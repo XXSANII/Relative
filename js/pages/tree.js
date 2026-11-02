@@ -56,7 +56,6 @@
     gradient("g-male", "#3f7df0", "#6a4de0");
     gradient("g-female", "#f2709c", "#d9488f");
     gradient("g-unknown", "#7b80a5", "#575c80");
-    gradient("g-deceased", "#8e93a1", "#656b7a");
     const g = svg.append("g");
     const zoom = d3
       .zoom()
@@ -92,10 +91,8 @@
       cards
         .append("rect")
         .attr("class", (d) => {
-          // เสียชีวิตแล้ว = สีเทา; ไม่งั้นใช้สีตามเพศ
-          const kind = d.data.deceased
-            ? "deceased"
-            : d.data.gender === "F"
+          const kind =
+            d.data.gender === "F"
               ? "female"
               : d.data.gender === "M"
                 ? "male"
@@ -111,7 +108,7 @@
         .attr("height", layout.cardH)
         .html(
           (d) =>
-            `<div class="tree-card"><img class="tree-avatar" src="${esc(d.data.avatar || DEFAULT_AVATAR)}" alt=""><span>${esc(d.data.name)}</span></div>`,
+            `<div class="tree-card"><img class="tree-avatar" src="${esc(d.data.avatar || DEFAULT_AVATAR)}" alt=""><span>${esc(d.data.name)}${d.data.deceased ? " (เสียชีวิต)" : ""}</span></div>`,
         );
     };
 
