@@ -80,7 +80,7 @@
                      <button data-act="move" class="ghost">ย้าย</button>
                      ${m.has_account ? `<button data-act="${m.is_admin ? "unadmin" : "admin"}" class="ghost">${m.is_admin ? "ถอดผู้ดูแล" : "ตั้งเป็นผู้ดูแล"}</button>` : ""}
                      <button data-act="remove" class="danger">เอาออก</button>`
-                  : '<button data-act="promote" class="ghost">เลื่อนเป็นสมาชิกหลัก</button>'
+                  : '<button data-act="edit" class="ghost">แก้ไข</button> <button data-act="promote" class="ghost">เลื่อนเป็นสมาชิกหลัก</button>'
               }</div></div>`;
           })
           .join("")
@@ -293,16 +293,19 @@
     "mother_name", "spouse_name", "house_no", "road", "subdistrict",
     "district", "province", "postal_code",
   ];
-  let original = null;
+  let original = null,
+    isBasic = false;
   const openEdit = async (id, name) => {
-    const { data, error } = await sb.from("person").select("*").eq("id", id).single();
-    if (error) throw error;
+    const data = await call("clan_get_person", { p_person_id: id });
     target = id;
     original = data;
     $("editTitle").textContent = `แก้ไขข้อมูล: ${name}`;
     for (const k of TEXT) $("f_" + k).value = data[k] ?? "";
     $("f_gender").value = data.gender ?? "";
     $("f_deceased").checked = !!data.deceased;
+    // ผู้เชื่อมโยง (basic) แก้ได้เฉพาะข้อมูลพื้นฐาน ซ่อนช่องที่เหลือ
+    isBasic = data.level === "basic";
+    $("fullFields").hidden = isBasic;
     $("f_birth_date").value = "";
     showMessage("editMessage", "");
     $("editDialog").showModal();
@@ -311,7 +314,7 @@
   $("editForm").addEventListener("submit", async (e) => {
     e.preventDefault();
     const patch = {};
-    for (const k of [...TEXT, "gender"]) {
+    for (const k of isBasic ? ["prefix", "full_name", "nickname", "gender"] : [...TEXT, "gender"]) {
       const v = $("f_" + k).value.trim();
       if (v !== String(original[k] ?? "").trim()) patch[k] = v;
     }
