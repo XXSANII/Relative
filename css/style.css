@@ -718,8 +718,34 @@ button:disabled {
     padding: 6px 11px;
     font-size: 0.85rem;
   }
+  /* มือถือ: แถบเมนูย้ายไปติดขอบล่างจอ (ซ่อนชื่อเว็บ ให้ปุ่มเรียงเต็มแถว) */
+  body {
+    padding-bottom: calc(84px + env(safe-area-inset-bottom));
+  }
+  .banner {
+    position: fixed;
+    top: auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 0 0 calc(10px + env(safe-area-inset-bottom));
+  }
   .banner .wrap {
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    padding: 8px;
     border-radius: 24px;
+  }
+  .banner .wrap::before,
+  .brand {
+    display: none;
+  }
+  .banner .navbtn {
+    flex: 1 1 0;
+    min-width: 0;
+    padding: 9px 4px;
+    font-size: 0.78rem;
+    text-align: center;
   }
   .child-fields {
     grid-template-columns: 1fr;
