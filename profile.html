@@ -34,9 +34,7 @@
           <div class="row">
             <strong>เบอร์โทร</strong><span id="phone"></span>
           </div>
-          <div class="row">
-            <strong>LINE ID</strong><span id="line"></span>
-          </div>
+          <div class="row"><strong>LINE ID</strong><span id="line"></span></div>
           <div class="row">
             <strong>ที่อยู่</strong><span id="address"></span>
           </div>
@@ -63,6 +61,11 @@
             การแก้ไขวันเกิดไม่เปลี่ยนรหัสผ่าน
             เว้นแต่เลือกตั้งรหัสผ่านใหม่ด้านล่าง
           </p>
+          <label class="check" for="e_deceased"
+            ><input type="checkbox" id="e_deceased" /><span
+              >เสียชีวิตแล้ว (แสดงเป็นสีเทาในต้นไม้ครอบครัว)</span
+            ></label
+          >
           <label for="e_prefix">คำนำหน้า</label
           ><input
             id="e_prefix"
@@ -112,9 +115,7 @@
             maxlength="20"
             autocomplete="off"
             placeholder="เช่น somchai_01"
-          /><label class="check" for="e_deceased"
-            ><input type="checkbox" id="e_deceased" /><span>เสียชีวิตแล้ว (แสดงเป็นสีเทาในต้นไม้ครอบครัว)</span></label
-          ><label for="e_gender">เพศ</label
+          /><label for="e_gender">เพศ</label
           ><select id="e_gender">
             <option value="">ไม่ระบุ</option>
             <option value="male">ชาย</option>
