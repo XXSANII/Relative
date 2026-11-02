@@ -847,3 +847,42 @@ button:disabled {
     transition: none !important;
   }
 }
+
+/* ปุ่มดูทั้งหมด + ข้อความจำนวนคน, ไฮไลต์ตำแหน่งตอนค้นหาในโหมดดูทั้งหมด */
+.tree-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+.tree-toolbar button {
+  width: auto;
+  margin-top: 12px;
+  padding: 9px 18px;
+}
+.tree-toolbar button[aria-pressed="true"] {
+  background: linear-gradient(135deg, var(--primary), var(--primary-2));
+  color: #fff;
+  box-shadow: 0 8px 20px rgba(108, 92, 231, 0.3);
+}
+.tree-toolbar .muted {
+  margin-top: 12px;
+}
+.tree-canvas .node.pulse .card-bg {
+  animation: pulseRing 0.9s ease-out 3;
+}
+@keyframes pulseRing {
+  0% {
+    stroke: #fff;
+    stroke-width: 3;
+  }
+  50% {
+    stroke: #ffd166;
+    stroke-width: 9;
+  }
+  100% {
+    stroke: #fff;
+    stroke-width: 3;
+  }
+}

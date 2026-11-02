@@ -191,3 +191,32 @@ function computeTreeLayout(items) {
   const height = MARGIN * 2 + genKeys.length * CARD_H + (genKeys.length - 1) * ROW_GAP;
   return { nodes, edges, width, height, cardW: CARD_W, cardH: CARD_H };
 }
+
+// เฉพาะคนที่เกี่ยวข้องกับ id: ตัวเอง บรรพบุรุษทุกรุ่น ลูกหลานทุกรุ่น พี่น้อง และคู่สมรสของทุกคนที่เลือก
+// ใช้โหมด "เฉพาะที่เกี่ยวข้อง" ของหน้าต้นไม้ (โหมด "ดูทั้งหมด" ใช้ items ทั้งหมด)
+function relatedItems(items, id) {
+  const byId = new Map(items.map((d) => [d.id, d]));
+  if (!byId.has(id)) return items;
+  const keep = new Set([id]);
+  const walk = (start, key) => {
+    const stack = [start];
+    while (stack.length) {
+      const d = byId.get(stack.pop());
+      for (const x of d?.rels[key] || []) {
+        if (byId.has(x) && !keep.has(x)) {
+          keep.add(x);
+          stack.push(x);
+        }
+      }
+    }
+  };
+  walk(id, "parents");
+  walk(id, "children");
+  for (const p of byId.get(id).rels.parents || []) {
+    for (const c of byId.get(p)?.rels.children || []) if (byId.has(c)) keep.add(c);
+  }
+  for (const k of [...keep]) {
+    for (const sp of byId.get(k).rels.spouses || []) if (byId.has(sp)) keep.add(sp);
+  }
+  return items.filter((d) => keep.has(d.id));
+}

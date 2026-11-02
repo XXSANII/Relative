@@ -16,7 +16,7 @@
     // เริ่มจาก ?id= ถ้ามี ไม่เช่นนั้นเริ่มจากตัวเอง (ถ้ามีความสัมพันธ์) หรือคนแรกในรายการ
     const ids = new Set(connected.map((d) => d.id));
     const wanted = String(new URLSearchParams(location.search).get("id") || "");
-    const start = ids.has(wanted)
+    let current = ids.has(wanted)
       ? wanted
       : ids.has(String(me.id))
         ? String(me.id)
@@ -26,13 +26,13 @@
     const people = [...connected].sort(compareByAge);
     const search = $("treeSearch");
     const results = $("treeResults");
-    search.value = byId.get(start).data.name;
-    $("treeTools").hidden = false;
-    $("treeCanvas").hidden = false;
-
-    // แผนภาพ: แต่ละรุ่นเป็นแถว เรียงอายุมาก → น้อยจากซ้ายไปขวาทั้งแถว (tree-layout.js)
-    const layout = computeTreeLayout(connected);
+    const viewAllBtn = $("viewAllBtn");
+    const info = $("treeInfo");
     const el = $("treeCanvas");
+    search.value = byId.get(current).data.name;
+    $("treeTools").hidden = false;
+    el.hidden = false;
+
     const svg = d3
       .select(el)
       .append("svg")
@@ -43,15 +43,15 @@
     // สีไล่เฉดของการ์ด (อ้างอิงใน style.css ด้วย fill:url(#g-...))
     const defs = svg.append("defs");
     const gradient = (id, from, to) => {
-      const g = defs
+      const gr = defs
         .append("linearGradient")
         .attr("id", id)
         .attr("x1", 0)
         .attr("y1", 0)
         .attr("x2", 1)
         .attr("y2", 1);
-      g.append("stop").attr("offset", "0%").attr("stop-color", from);
-      g.append("stop").attr("offset", "100%").attr("stop-color", to);
+      gr.append("stop").attr("offset", "0%").attr("stop-color", from);
+      gr.append("stop").attr("offset", "100%").attr("stop-color", to);
     };
     gradient("g-male", "#3f7df0", "#6a4de0");
     gradient("g-female", "#f2709c", "#d9488f");
@@ -64,71 +64,122 @@
       .on("zoom", (e) => g.attr("transform", e.transform));
     svg.call(zoom).on("dblclick.zoom", null);
 
-    g.append("g")
-      .selectAll("path")
-      .data(layout.edges)
-      .join("path")
-      .attr("class", (d) => `edge ${d.type}`)
-      .attr("d", (d) => d.d);
+    // วาดแผนภาพจากรายชื่อที่ส่งมา (แถวต่อรุ่น เรียงอายุมาก → น้อย: tree-layout.js)
+    let layout = null,
+      cards = null,
+      shownKey = null,
+      viewAll = false;
+    const draw = (items) => {
+      layout = computeTreeLayout(items);
+      g.selectAll("*").remove();
+      g.append("g")
+        .selectAll("path")
+        .data(layout.edges)
+        .join("path")
+        .attr("class", (d) => `edge ${d.type}`)
+        .attr("d", (d) => d.d);
+      cards = g
+        .append("g")
+        .selectAll("g")
+        .data(layout.nodes)
+        .join("g")
+        .attr("class", "node")
+        .style("animation-delay", (d, i) => `${Math.min(i * 35, 700)}ms`)
+        .attr("transform", (d) => `translate(${d.x},${d.y})`)
+        .on("click", (e, d) => {
+          location.href = `profile.html?id=${d.id}`;
+        });
+      cards
+        .append("rect")
+        .attr("class", (d) => {
+          // เสียชีวิตแล้ว = สีเทา; ไม่งั้นใช้สีตามเพศ
+          const kind = d.data.deceased
+            ? "deceased"
+            : d.data.gender === "F"
+              ? "female"
+              : d.data.gender === "M"
+                ? "male"
+                : "unknown";
+          return `card-bg ${kind}`;
+        })
+        .attr("width", layout.cardW)
+        .attr("height", layout.cardH)
+        .attr("rx", 10);
+      cards
+        .append("foreignObject")
+        .attr("width", layout.cardW)
+        .attr("height", layout.cardH)
+        .html(
+          (d) =>
+            `<div class="tree-card"><img class="tree-avatar" src="${esc(d.data.avatar || DEFAULT_AVATAR)}" alt=""><span>${esc(d.data.name)}</span></div>`,
+        );
+    };
 
-    const cards = g
-      .append("g")
-      .selectAll("g")
-      .data(layout.nodes)
-      .join("g")
-      .attr("class", "node")
-      .style("animation-delay", (d, i) => `${Math.min(i * 35, 700)}ms`)
-      .attr("transform", (d) => `translate(${d.x},${d.y})`)
-      .on("click", (e, d) => {
-        location.href = `profile.html?id=${d.id}`;
-      });
-    cards
-      .append("rect")
-      .attr("class", (d) => {
-        // เสียชีวิตแล้ว = สีเทา; ไม่งั้นใช้สีตามเพศ
-        const kind = d.data.deceased
-          ? "deceased"
-          : d.data.gender === "F"
-            ? "female"
-            : d.data.gender === "M"
-              ? "male"
-              : "unknown";
-        return `card-bg ${kind}`;
-      })
-      .attr("width", layout.cardW)
-      .attr("height", layout.cardH)
-      .attr("rx", 10);
-    cards
-      .append("foreignObject")
-      .attr("width", layout.cardW)
-      .attr("height", layout.cardH)
-      .html(
-        (d) =>
-          `<div class="tree-card"><img class="tree-avatar" src="${esc(d.data.avatar || DEFAULT_AVATAR)}" alt=""><span>${esc(d.data.name)}</span></div>`,
-      );
-
-    // โฟกัสที่สมาชิกหนึ่งคน: จัดให้อยู่กลางพื้นที่ และไฮไลต์การ์ด
-    const focus = (id, animate) => {
-      const n = layout.nodes.find((x) => x.id === id);
-      if (!n) return;
-      cards.classed("selected", (d) => d.id === id);
-      const k = d3.zoomTransform(svg.node()).k || 1;
-      const t = d3.zoomIdentity
+    const transformFor = (n, k) =>
+      d3.zoomIdentity
         .translate(
           el.clientWidth / 2 - k * (n.x + layout.cardW / 2),
           el.clientHeight / 2 - k * (n.y + layout.cardH / 2),
         )
         .scale(k);
-      const target = animate ? svg.transition().duration(400) : svg;
-      target.call(zoom.transform, t);
-    };
-    focus(start, false);
+    const apply = (t, animate) =>
+      (animate ? svg.transition().duration(450) : svg).call(zoom.transform, t);
 
-    // ค้นหาจากชื่อหรือชื่อเล่น แสดงผลลัพธ์เฉพาะเมื่อพิมพ์ (เหมือนหน้า Home) เลือกแล้วย้ายแผนภาพไปที่คนนั้น
+    // เลื่อนไปที่สมาชิกหนึ่งคน ไฮไลต์การ์ด และในโหมดดูทั้งหมดให้วงแหวนกะพริบบอกตำแหน่ง
+    const focus = (id, animate, k) => {
+      const n = layout.nodes.find((x) => x.id === id);
+      if (!n) return;
+      cards.classed("selected", (d) => d.id === id).classed("pulse", false);
+      if (viewAll) {
+        setTimeout(() => cards.classed("pulse", (d) => d.id === id), 30);
+      }
+      apply(transformFor(n, k ?? (d3.zoomTransform(svg.node()).k || 1)), animate);
+    };
+    // ย่อให้เห็นทั้งต้นไม้ในหน้าเดียว (ไม่เล็กกว่า 0.35 และไม่ขยายเกินของจริง)
+    const fitAll = (animate) => {
+      const k = Math.max(
+        0.35,
+        Math.min(1, el.clientWidth / layout.width, el.clientHeight / layout.height),
+      );
+      const t = d3.zoomIdentity
+        .translate(
+          (el.clientWidth - k * layout.width) / 2,
+          (el.clientHeight - k * layout.height) / 2,
+        )
+        .scale(k);
+      apply(t, animate);
+      cards.classed("selected", (d) => d.id === current);
+    };
+
+    // แสดงผลตามโหมด: ดูทั้งหมด หรือเฉพาะคนที่เกี่ยวข้องกับ current
+    const render = (animate, mode) => {
+      const key = viewAll ? "all" : current;
+      if (shownKey !== key) {
+        draw(viewAll ? connected : relatedItems(connected, current));
+        shownKey = key;
+      }
+      info.textContent = viewAll
+        ? `แสดงทั้งหมด ${layout.nodes.length} คน`
+        : `แสดง ${layout.nodes.length} จาก ${connected.length} คน (เฉพาะที่เกี่ยวข้องกับคนที่เลือก)`;
+      if (mode === "fit") fitAll(animate);
+      else focus(current, animate, viewAll ? undefined : 1);
+    };
+    render(false);
+
+    viewAllBtn.addEventListener("click", () => {
+      viewAll = !viewAll;
+      viewAllBtn.setAttribute("aria-pressed", String(viewAll));
+      viewAllBtn.textContent = viewAll ? "🎯 ดูเฉพาะที่เกี่ยวข้อง" : "🌐 ดูทั้งหมด";
+      render(true, viewAll ? "fit" : undefined);
+    });
+
+    // ค้นหาจากชื่อหรือชื่อเล่น แสดงผลลัพธ์เฉพาะเมื่อพิมพ์ (เหมือนหน้า Home)
+    // โหมดเฉพาะที่เกี่ยวข้อง: วาดใหม่เฉพาะคนที่เกี่ยวข้อง / โหมดดูทั้งหมด: คงภาพรวมแล้วชี้ตำแหน่งคนนั้น
     const pick = (id) => {
+      current = id;
       search.value = byId.get(id).data.name;
       results.innerHTML = "";
-      focus(id, true);
+      render(true);
     };
     search.addEventListener("input", () => {
       const q = normalize(search.value);
