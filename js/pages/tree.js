@@ -40,6 +40,23 @@
       .attr("height", "100%")
       .attr("role", "img")
       .attr("aria-label", "แผนภาพต้นไม้ครอบครัว");
+    // สีไล่เฉดของการ์ด (อ้างอิงใน style.css ด้วย fill:url(#g-...))
+    const defs = svg.append("defs");
+    const gradient = (id, from, to) => {
+      const g = defs
+        .append("linearGradient")
+        .attr("id", id)
+        .attr("x1", 0)
+        .attr("y1", 0)
+        .attr("x2", 1)
+        .attr("y2", 1);
+      g.append("stop").attr("offset", "0%").attr("stop-color", from);
+      g.append("stop").attr("offset", "100%").attr("stop-color", to);
+    };
+    gradient("g-male", "#3f7df0", "#6a4de0");
+    gradient("g-female", "#f2709c", "#d9488f");
+    gradient("g-unknown", "#7b80a5", "#575c80");
+    gradient("g-deceased", "#8e93a1", "#656b7a");
     const g = svg.append("g");
     const zoom = d3
       .zoom()
@@ -60,6 +77,7 @@
       .data(layout.nodes)
       .join("g")
       .attr("class", "node")
+      .style("animation-delay", (d, i) => `${Math.min(i * 35, 700)}ms`)
       .attr("transform", (d) => `translate(${d.x},${d.y})`)
       .on("click", (e, d) => {
         location.href = `profile.html?id=${d.id}`;

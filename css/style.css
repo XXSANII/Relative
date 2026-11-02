@@ -1,111 +1,67 @@
-/* ===== ชุดสี (shadcn/ui โทนอินดิโก) ===== */
+@import url("https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700&display=swap");
+
+/* ===== ชุดสี: ม่วง–ชมพู–มิ้นต์ สว่างสดใส (ใช้ hex/rgba ล้วน เบราว์เซอร์เก่าก็เห็นสี) ===== */
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.147 0.004 49.25);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.147 0.004 49.25);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.147 0.004 49.25);
-  --primary: oklch(0.457 0.24 277.023);
-  --primary-foreground: oklch(0.962 0.018 272.314);
-  --secondary: oklch(0.967 0.001 286.375);
-  --secondary-foreground: oklch(0.21 0.006 285.885);
-  --muted: oklch(0.97 0.001 106.424);
-  --muted-foreground: oklch(0.553 0.013 58.071);
-  --accent: oklch(0.97 0.001 106.424);
-  --accent-foreground: oklch(0.216 0.006 56.043);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.923 0.003 48.717);
-  --input: oklch(0.923 0.003 48.717);
-  --ring: oklch(0.709 0.01 56.259);
-  --chart-1: oklch(0.809 0.105 251.813);
-  --chart-2: oklch(0.623 0.214 259.815);
-  --chart-3: oklch(0.546 0.245 262.881);
-  --chart-4: oklch(0.488 0.243 264.376);
-  --chart-5: oklch(0.424 0.199 265.638);
-  --radius: 0.875rem;
-  --sidebar: oklch(0.985 0.001 106.423);
-  --sidebar-foreground: oklch(0.147 0.004 49.25);
-  --sidebar-primary: oklch(0.511 0.262 276.966);
-  --sidebar-primary-foreground: oklch(0.962 0.018 272.314);
-  --sidebar-accent: oklch(0.97 0.001 106.424);
-  --sidebar-accent-foreground: oklch(0.216 0.006 56.043);
-  --sidebar-border: oklch(0.923 0.003 48.717);
-  --sidebar-ring: oklch(0.709 0.01 56.259);
-  /* เพิ่มเติมจากชุดสีหลัก */
-  --link: var(--primary);
-  --success: oklch(0.527 0.154 150.069);
+  --bg: #f5f3ff;
+  --fg: #1e1b3a;
+  --muted: #6b6890;
+  --card: rgba(255, 255, 255, 0.8);
+  --card-solid: #ffffff;
+  --border: rgba(108, 92, 231, 0.16);
+  --primary: #6c5ce7;
+  --primary-2: #ff6fa5;
+  --accent: #19c3b0;
+  --soft: rgba(108, 92, 231, 0.1);
+  --input-bg: rgba(255, 255, 255, 0.95);
+  --input-border: #dcd8f5;
+  --danger: #e5484d;
+  --success: #16a37f;
+  --nav-bg: rgba(255, 255, 255, 0.78);
+  --shadow: 0 12px 34px rgba(108, 92, 231, 0.16);
+  --shadow-sm: 0 4px 14px rgba(108, 92, 231, 0.12);
+  --radius: 22px;
+  --pad: 22px;
   color-scheme: light;
 }
-
 .dark {
-  --background: oklch(0.147 0.004 49.25);
-  --foreground: oklch(0.985 0.001 106.423);
-  --card: oklch(0.216 0.006 56.043);
-  --card-foreground: oklch(0.985 0.001 106.423);
-  --popover: oklch(0.216 0.006 56.043);
-  --popover-foreground: oklch(0.985 0.001 106.423);
-  --primary: oklch(0.398 0.195 277.366);
-  --primary-foreground: oklch(0.962 0.018 272.314);
-  --secondary: oklch(0.274 0.006 286.033);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.268 0.007 34.298);
-  --muted-foreground: oklch(0.709 0.01 56.259);
-  --accent: oklch(0.268 0.007 34.298);
-  --accent-foreground: oklch(0.985 0.001 106.423);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.553 0.013 58.071);
-  --chart-1: oklch(0.809 0.105 251.813);
-  --chart-2: oklch(0.623 0.214 259.815);
-  --chart-3: oklch(0.546 0.245 262.881);
-  --chart-4: oklch(0.488 0.243 264.376);
-  --chart-5: oklch(0.424 0.199 265.638);
-  --sidebar: oklch(0.216 0.006 56.043);
-  --sidebar-foreground: oklch(0.985 0.001 106.423);
-  --sidebar-primary: oklch(0.585 0.233 277.117);
-  --sidebar-primary-foreground: oklch(0.962 0.018 272.314);
-  --sidebar-accent: oklch(0.268 0.007 34.298);
-  --sidebar-accent-foreground: oklch(0.985 0.001 106.423);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.553 0.013 58.071);
-  --link: oklch(0.72 0.15 277);
-  --success: oklch(0.76 0.16 150);
+  --bg: #0f0d1c;
+  --fg: #f1efff;
+  --muted: #a29fc4;
+  --card: rgba(30, 26, 56, 0.78);
+  --card-solid: #1c1838;
+  --border: rgba(160, 150, 255, 0.18);
+  --primary: #8b7bff;
+  --primary-2: #ff7fb0;
+  --accent: #35d9c5;
+  --soft: rgba(139, 123, 255, 0.16);
+  --input-bg: rgba(20, 17, 40, 0.85);
+  --input-border: rgba(160, 150, 255, 0.28);
+  --danger: #ff7076;
+  --success: #3ddbb0;
+  --nav-bg: rgba(24, 20, 46, 0.78);
+  --shadow: 0 12px 34px rgba(0, 0, 0, 0.45);
+  --shadow-sm: 0 4px 14px rgba(0, 0, 0, 0.35);
   color-scheme: dark;
 }
-
-/* ตามโหมดสว่าง/มืดของเครื่อง (เพิ่มคลาส .light ที่ <html> เพื่อบังคับโหมดสว่าง) */
 @media (prefers-color-scheme: dark) {
   :root:not(.light) {
-    --background: oklch(0.147 0.004 49.25);
-    --foreground: oklch(0.985 0.001 106.423);
-    --card: oklch(0.216 0.006 56.043);
-    --card-foreground: oklch(0.985 0.001 106.423);
-    --popover: oklch(0.216 0.006 56.043);
-    --popover-foreground: oklch(0.985 0.001 106.423);
-    --primary: oklch(0.398 0.195 277.366);
-    --primary-foreground: oklch(0.962 0.018 272.314);
-    --secondary: oklch(0.274 0.006 286.033);
-    --secondary-foreground: oklch(0.985 0 0);
-    --muted: oklch(0.268 0.007 34.298);
-    --muted-foreground: oklch(0.709 0.01 56.259);
-    --accent: oklch(0.268 0.007 34.298);
-    --accent-foreground: oklch(0.985 0.001 106.423);
-    --destructive: oklch(0.704 0.191 22.216);
-    --border: oklch(1 0 0 / 10%);
-    --input: oklch(1 0 0 / 15%);
-    --ring: oklch(0.553 0.013 58.071);
-    --sidebar: oklch(0.216 0.006 56.043);
-    --sidebar-foreground: oklch(0.985 0.001 106.423);
-    --sidebar-primary: oklch(0.585 0.233 277.117);
-    --sidebar-primary-foreground: oklch(0.962 0.018 272.314);
-    --sidebar-accent: oklch(0.268 0.007 34.298);
-    --sidebar-accent-foreground: oklch(0.985 0.001 106.423);
-    --sidebar-border: oklch(1 0 0 / 10%);
-    --sidebar-ring: oklch(0.553 0.013 58.071);
-    --link: oklch(0.72 0.15 277);
-    --success: oklch(0.76 0.16 150);
+    --bg: #0f0d1c;
+    --fg: #f1efff;
+    --muted: #a29fc4;
+    --card: rgba(30, 26, 56, 0.78);
+    --card-solid: #1c1838;
+    --border: rgba(160, 150, 255, 0.18);
+    --primary: #8b7bff;
+    --primary-2: #ff7fb0;
+    --accent: #35d9c5;
+    --soft: rgba(139, 123, 255, 0.16);
+    --input-bg: rgba(20, 17, 40, 0.85);
+    --input-border: rgba(160, 150, 255, 0.28);
+    --danger: #ff7076;
+    --success: #3ddbb0;
+    --nav-bg: rgba(24, 20, 46, 0.78);
+    --shadow: 0 12px 34px rgba(0, 0, 0, 0.45);
+    --shadow-sm: 0 4px 14px rgba(0, 0, 0, 0.35);
     color-scheme: dark;
   }
 }
@@ -115,169 +71,331 @@
   box-sizing: border-box;
 }
 body {
+  position: relative;
   margin: 0;
-  background: var(--background);
-  color: var(--foreground);
-  font-family: system-ui, "Noto Sans Thai", sans-serif;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: "Prompt", system-ui, "Noto Sans Thai", sans-serif;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+/* ลูกบอลสีฟุ้งลอยเบา ๆ เป็นพื้นหลัง */
+body::before {
+  content: "";
+  position: fixed;
+  inset: -10%;
+  z-index: -1;
+  background:
+    radial-gradient(38vmax 38vmax at 8% 4%, rgba(108, 92, 231, 0.28), transparent 62%),
+    radial-gradient(34vmax 34vmax at 96% 8%, rgba(255, 111, 165, 0.24), transparent 62%),
+    radial-gradient(40vmax 40vmax at 55% 108%, rgba(25, 195, 176, 0.2), transparent 62%);
+  animation: drift 22s ease-in-out infinite alternate;
+}
+@keyframes drift {
+  from {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  to {
+    transform: translate3d(2%, 3%, 0) scale(1.08);
+  }
+}
+::selection {
+  background: rgba(108, 92, 231, 0.28);
+}
+a {
+  color: var(--primary);
+  font-weight: 500;
+  text-underline-offset: 3px;
 }
 .wrap {
   width: min(760px, 100% - 28px);
   margin: auto;
 }
+.wrap.wide {
+  width: min(1100px, 100% - 28px);
+}
 [hidden] {
   display: none !important;
 }
 main {
-  padding: 18px 0 48px;
+  padding: 22px 0 56px;
 }
 h1 {
-  font-size: 1.45rem;
+  font-size: 1.65rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
   margin: 0 0 8px;
 }
 h2 {
-  font-size: 1.2rem;
+  font-size: 1.25rem;
+  font-weight: 650;
   margin: 0 0 14px;
 }
 .muted {
-  color: var(--muted-foreground);
-  font-size: 0.9rem;
+  color: var(--muted);
+  font-size: 0.92rem;
 }
 .hint {
   font-size: 0.85rem;
-  color: var(--muted-foreground);
+  color: var(--muted);
   margin-top: 6px;
 }
 
-/* ===== แถบบน ===== */
+/* ===== แถบบน: แคปซูลโปร่งแสงลอยอยู่บนสุด ===== */
 .banner {
   position: sticky;
   top: 0;
   z-index: 5;
-  background: var(--primary);
-  color: var(--primary-foreground);
-  box-shadow: 0 1px 3px oklch(0 0 0 / 15%);
+  padding-top: 12px;
 }
 .banner .wrap {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 12px 0;
+  gap: 8px;
   flex-wrap: wrap;
+  padding: 9px 12px 9px 18px;
+  background: var(--nav-bg);
+  -webkit-backdrop-filter: blur(16px) saturate(1.4);
+  backdrop-filter: blur(16px) saturate(1.4);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  box-shadow: var(--shadow-sm);
 }
 .brand {
-  font-weight: 750;
-  font-size: 1.1rem;
-  color: var(--primary-foreground);
-  text-decoration: none;
   margin-right: auto;
+  font-weight: 700;
+  font-size: 1.08rem;
+  text-decoration: none;
+  background: linear-gradient(90deg, var(--primary), var(--primary-2));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  white-space: nowrap;
 }
-.navbtn {
+/* อิโมจิต้นไม้อยู่นอกตัวอักษรไล่สี (ไม่งั้นอิโมจิจะกลายเป็นก้อนสี) */
+.banner .wrap::before {
+  content: "🌳";
+  font-size: 1.35rem;
+  line-height: 1;
+  margin-right: -2px;
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.banner .wrap:hover::before {
+  transform: rotate(-14deg) scale(1.2);
+}
+.navbtn,
+a.navbtn {
+  display: inline-block;
   width: auto;
   margin: 0;
-  padding: 8px 13px;
-  background: color-mix(in oklab, var(--primary-foreground) 14%, transparent);
-  color: var(--primary-foreground);
-  border: 1px solid
-    color-mix(in oklab, var(--primary-foreground) 35%, transparent);
+  padding: 7px 14px;
+  border-radius: 999px;
+  background: var(--soft);
+  color: var(--primary);
+  box-shadow: none;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
 }
-.navbtn:hover {
-  background: color-mix(in oklab, var(--primary-foreground) 24%, transparent);
+.navbtn:hover,
+a.navbtn:hover {
+  background: linear-gradient(135deg, var(--primary), var(--primary-2));
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgba(108, 92, 231, 0.3);
 }
 
-/* ===== การ์ด ===== */
+/* ===== การ์ดกระจกฝ้า เด้งขึ้นมาตอนเปิดหน้า ===== */
 .card {
+  position: relative;
   background: var(--card);
-  color: var(--card-foreground);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  color: var(--fg);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 20px;
-  margin: 0 0 16px;
-  box-shadow:
-    0 1px 3px oklch(0 0 0 / 6%),
-    0 1px 2px oklch(0 0 0 / 4%);
+  padding: var(--pad);
+  margin: 0 0 18px;
+  box-shadow: var(--shadow);
+  animation: rise 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.card:nth-of-type(2) {
+  animation-delay: 0.08s;
+}
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+/* แบนเนอร์ตราเครือญาติด้านบนการ์ดหน้า Login/Register */
+.card--hero {
+  padding-top: 0;
+  overflow: hidden;
+}
+.hero {
+  display: block;
+  width: calc(100% + var(--pad) * 2);
+  max-width: none;
+  margin: 0 calc(var(--pad) * -1) 18px;
+  height: auto;
+  aspect-ratio: 5 / 2;
+  object-fit: cover;
+  object-position: center 62%;
+  animation: zoomSlow 14s ease-in-out infinite alternate;
+}
+@keyframes zoomSlow {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.07);
+  }
 }
 
 /* ===== ฟอร์ม ===== */
 label {
   display: block;
-  margin: 12px 0 5px;
-  font-size: 0.92rem;
-  font-weight: 500;
-  color: var(--foreground);
+  margin: 14px 0 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--fg);
 }
 input,
 select,
 textarea {
   display: block;
   width: 100%;
-  padding: 10px 12px;
-  border: 1px solid var(--input);
-  border-radius: calc(var(--radius) - 2px);
+  padding: 12px 15px;
+  border: 1.5px solid var(--input-border);
+  border-radius: 16px;
   font: inherit;
-  background: transparent;
-  color: var(--foreground);
+  background: var(--input-bg);
+  color: var(--fg);
   outline: none;
   transition:
-    border-color 0.15s,
-    box-shadow 0.15s;
+    border-color 0.2s,
+    box-shadow 0.2s,
+    transform 0.2s;
+}
+input:hover,
+select:hover,
+textarea:hover {
+  border-color: var(--primary);
 }
 input::placeholder,
 textarea::placeholder {
-  color: var(--muted-foreground);
+  color: var(--muted);
+  opacity: 0.8;
+}
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px rgba(108, 92, 231, 0.2);
+}
+select {
+  -webkit-appearance: none;
+  appearance: none;
+  padding-right: 40px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%238d8aae' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
 }
 select option {
-  background: var(--popover);
-  color: var(--popover-foreground);
+  background: var(--card-solid);
+  color: var(--fg);
 }
-input:focus-visible,
-select:focus-visible,
-textarea:focus-visible {
-  border-color: var(--ring);
-  box-shadow: 0 0 0 3px color-mix(in oklab, var(--ring) 50%, transparent);
+input[type="search"] {
+  padding-left: 44px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%238d8aae' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m20 20-3.5-3.5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: 15px center;
+}
+input[type="file"] {
+  padding: 10px;
+  border-style: dashed;
+  cursor: pointer;
+}
+input[type="file"]::file-selector-button {
+  margin-right: 12px;
+  padding: 7px 14px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--soft);
+  color: var(--primary);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
 }
 textarea {
   resize: vertical;
 }
 
-/* ===== ปุ่ม ===== */
+/* ===== ปุ่ม: ไล่สี ม่วง→ชมพู มีเงาเรืองและเด้งตอนชี้ ===== */
 button {
   width: 100%;
-  padding: 10px 14px;
+  padding: 12px 18px;
   border: 0;
-  border-radius: calc(var(--radius) - 2px);
-  background: var(--primary);
-  color: var(--primary-foreground);
+  border-radius: 16px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-2));
+  background-size: 160% 100%;
+  background-position: 0 0;
+  color: #fff;
   font: inherit;
   font-weight: 600;
   cursor: pointer;
-  margin-top: 14px;
+  margin-top: 16px;
+  box-shadow: 0 8px 20px rgba(108, 92, 231, 0.3);
   transition:
-    opacity 0.15s,
-    background-color 0.15s;
+    transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.2s,
+    background-position 0.4s;
 }
 button:hover {
-  opacity: 0.9;
+  background-position: 100% 0;
+  transform: translateY(-2px);
+  box-shadow: 0 12px 26px rgba(108, 92, 231, 0.38);
+}
+button:active {
+  transform: translateY(0) scale(0.97);
 }
 button:focus-visible {
-  outline: 3px solid color-mix(in oklab, var(--ring) 50%, transparent);
+  outline: 3px solid rgba(108, 92, 231, 0.4);
   outline-offset: 2px;
 }
 button:disabled {
   opacity: 0.55;
   cursor: wait;
+  transform: none;
 }
 .ghost {
-  background: var(--secondary);
-  color: var(--secondary-foreground);
+  background: var(--soft);
+  color: var(--primary);
+  box-shadow: none;
+}
+.ghost:hover {
+  background: var(--soft);
+  box-shadow: 0 6px 16px rgba(108, 92, 231, 0.18);
 }
 .danger {
-  background: color-mix(in oklab, var(--destructive) 10%, transparent);
-  color: var(--destructive);
-  border: 1px solid color-mix(in oklab, var(--destructive) 30%, transparent);
+  background: rgba(229, 72, 77, 0.1);
+  color: var(--danger);
+  border: 1.5px solid rgba(229, 72, 77, 0.3);
+  box-shadow: none;
+}
+.danger:hover {
+  background: rgba(229, 72, 77, 0.16);
+  box-shadow: 0 6px 16px rgba(229, 72, 77, 0.2);
 }
 .actions {
   display: flex;
-  gap: 9px;
+  gap: 10px;
   flex-wrap: wrap;
 }
 .actions button {
@@ -286,129 +404,179 @@ button:disabled {
 }
 
 /* ===== ข้อความแจ้ง ===== */
+.error,
+.success {
+  border-radius: 16px;
+  padding: 12px 16px;
+  margin: 14px 0;
+  animation: shake 0.4s ease-out;
+}
 .error {
-  color: var(--destructive);
-  background: color-mix(in oklab, var(--destructive) 10%, transparent);
-  border: 1px solid color-mix(in oklab, var(--destructive) 25%, transparent);
-  border-radius: calc(var(--radius) - 4px);
-  padding: 10px 12px;
-  margin: 12px 0;
+  color: var(--danger);
+  background: rgba(229, 72, 77, 0.1);
+  border: 1.5px solid rgba(229, 72, 77, 0.25);
 }
 .success {
   color: var(--success);
-  background: color-mix(in oklab, var(--success) 10%, transparent);
-  border: 1px solid color-mix(in oklab, var(--success) 25%, transparent);
-  border-radius: calc(var(--radius) - 4px);
-  padding: 10px 12px;
-  margin: 12px 0;
+  background: rgba(22, 163, 127, 0.1);
+  border: 1.5px solid rgba(22, 163, 127, 0.25);
+  animation: rise 0.4s both;
+}
+@keyframes shake {
+  20% {
+    transform: translateX(-5px);
+  }
+  50% {
+    transform: translateX(5px);
+  }
+  80% {
+    transform: translateX(-3px);
+  }
 }
 
 /* ===== ค้นหา / ผลลัพธ์ ===== */
-.search {
-  position: relative;
-}
 .results {
-  margin-top: 10px;
+  margin-top: 12px;
   display: grid;
-  gap: 8px;
+  gap: 10px;
 }
 .person-result {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
+  width: 100%;
   text-align: left;
-  background: var(--card);
-  color: var(--card-foreground);
-  border: 1px solid var(--border);
+  background: var(--card-solid);
+  color: var(--fg);
+  border: 1.5px solid var(--border);
+  border-radius: 18px;
   margin: 0;
-  padding: 12px;
+  padding: 12px 14px;
   font-weight: 400;
+  box-shadow: var(--shadow-sm);
+  animation: rise 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.results .person-result:nth-child(2) {
+  animation-delay: 0.04s;
+}
+.results .person-result:nth-child(3) {
+  animation-delay: 0.08s;
+}
+.results .person-result:nth-child(4) {
+  animation-delay: 0.12s;
+}
+.results .person-result:nth-child(n + 5) {
+  animation-delay: 0.16s;
 }
 .person-result:hover {
-  background: var(--accent);
-  color: var(--accent-foreground);
-  opacity: 1;
+  background: var(--card-solid);
+  border-color: var(--primary);
+  transform: translateX(4px);
+  box-shadow: 0 10px 24px rgba(108, 92, 231, 0.2);
+}
+.person-result strong {
+  font-weight: 600;
 }
 
 /* ===== โปรไฟล์ ===== */
 .avatar {
-  width: 76px;
-  height: 76px;
+  width: 88px;
+  height: 88px;
   border-radius: 50%;
   object-fit: cover;
-  background: var(--muted);
-  border: 2px solid var(--border);
+  border: 4px solid transparent;
+  background:
+    linear-gradient(var(--card-solid), var(--card-solid)) padding-box,
+    linear-gradient(135deg, var(--primary), var(--primary-2), var(--accent))
+      border-box;
+  box-shadow: 0 8px 22px rgba(108, 92, 231, 0.28);
+  animation: pop 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 .avatar.small {
-  width: 48px;
-  height: 48px;
+  width: 52px;
+  height: 52px;
+  border-width: 3px;
+  box-shadow: var(--shadow-sm);
+  animation: none;
+}
+@keyframes pop {
+  from {
+    opacity: 0;
+    transform: scale(0.5) rotate(-12deg);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 .profile-head {
   display: flex;
   align-items: center;
-  gap: 16px;
-  margin-bottom: 18px;
+  gap: 18px;
+  margin-bottom: 14px;
+  padding: 14px;
+  border-radius: 20px;
+  background: linear-gradient(
+    135deg,
+    rgba(108, 92, 231, 0.12),
+    rgba(255, 111, 165, 0.12)
+  );
 }
 .profile-head h1 {
   margin: 0;
+  font-size: 1.4rem;
 }
 .row {
   display: grid;
   grid-template-columns: 130px 1fr;
   gap: 12px;
-  padding: 10px 0;
-  border-bottom: 1px solid var(--border);
+  padding: 12px 4px;
+  border-bottom: 1px dashed var(--border);
+}
+.row:last-of-type {
+  border-bottom: 0;
 }
 .row strong {
-  color: var(--muted-foreground);
+  color: var(--muted);
   font-weight: 500;
+  font-size: 0.92rem;
 }
 .row span {
   overflow-wrap: anywhere;
 }
 .relation {
   display: inline-block;
-  background: none;
-  color: var(--link);
+  background: var(--soft);
+  color: var(--primary);
   border: 0;
-  padding: 0;
+  border-radius: 999px;
+  padding: 3px 12px;
   margin: 0;
   width: auto;
-  text-decoration: underline;
-  font-weight: 500;
+  font-weight: 600;
+  box-shadow: none;
 }
 .relation:hover {
-  opacity: 0.8;
+  background: linear-gradient(135deg, var(--primary), var(--primary-2));
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgba(108, 92, 231, 0.28);
 }
 .pending {
-  color: var(--foreground);
+  color: var(--fg);
 }
 .pending small {
-  color: var(--muted-foreground);
+  color: var(--muted);
   margin-left: 6px;
 }
 .preview {
   display: block;
-  width: 100px;
-  height: 100px;
+  width: 110px;
+  height: 110px;
   object-fit: cover;
   border-radius: 50%;
-  margin: 12px auto;
-}
-
-@media (max-width: 480px) {
-  .card {
-    padding: 16px;
-  }
-  .row {
-    grid-template-columns: 100px 1fr;
-  }
-  .brand {
-    font-size: 1rem;
-  }
-  .navbtn {
-    padding: 7px 10px;
-  }
+  margin: 14px auto;
+  box-shadow: var(--shadow-sm);
 }
 
 /* ===== วันเกิด / สวิตช์ / บุตรธิดา ===== */
@@ -421,9 +589,9 @@ button:disabled {
 .check {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin: 10px 0 4px;
-  font-weight: 400;
+  gap: 12px;
+  margin: 12px 0 4px;
+  font-weight: 500;
   cursor: pointer;
   width: fit-content;
 }
@@ -431,6 +599,11 @@ button:disabled {
 .check input {
   width: auto;
   margin: 0;
+}
+.check input {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--primary);
 }
 .switch input {
   position: absolute;
@@ -441,46 +614,49 @@ button:disabled {
 .switch .track {
   position: relative;
   flex: none;
-  width: 40px;
-  height: 22px;
+  width: 48px;
+  height: 28px;
   border-radius: 999px;
-  background: var(--input);
-  transition: background-color 0.15s;
+  background: var(--input-border);
+  transition: background 0.25s;
 }
 .switch .track::after {
   content: "";
   position: absolute;
   top: 3px;
   left: 3px;
-  width: 16px;
-  height: 16px;
+  width: 22px;
+  height: 22px;
   border-radius: 50%;
-  background: var(--background);
-  box-shadow: 0 1px 2px oklch(0 0 0 / 25%);
-  transition: transform 0.15s;
+  background: #fff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 .switch input:checked + .track {
-  background: var(--primary);
+  background: linear-gradient(135deg, var(--primary), var(--primary-2));
 }
 .switch input:checked + .track::after {
-  transform: translateX(18px);
+  transform: translateX(20px);
 }
 .switch input:focus-visible + .track {
-  box-shadow: 0 0 0 3px color-mix(in oklab, var(--ring) 50%, transparent);
+  box-shadow: 0 0 0 4px rgba(108, 92, 231, 0.25);
 }
 .switch-box .switch-body {
-  padding-left: 12px;
-  border-left: 2px solid var(--border);
+  padding-left: 14px;
+  border-left: 3px solid var(--soft);
 }
 .subhead {
-  font-size: 1rem;
-  margin: 20px 0 6px;
+  font-size: 1.05rem;
+  font-weight: 650;
+  margin: 24px 0 6px;
 }
 .child-row {
-  border: 1px solid var(--border);
-  border-radius: calc(var(--radius) - 4px);
-  padding: 4px 12px 12px;
-  margin: 10px 0;
+  border: 1.5px dashed var(--border);
+  background: var(--soft);
+  border-radius: 18px;
+  padding: 4px 14px 14px;
+  margin: 12px 0;
+  animation: rise 0.4s both;
 }
 .child-fields {
   display: grid;
@@ -489,18 +665,27 @@ button:disabled {
 }
 .child-row .remove-child {
   width: auto;
-  padding: 6px 12px;
-  margin-top: 10px;
+  padding: 7px 14px;
+  margin-top: 12px;
   font-size: 0.85rem;
 }
 .add-child {
   margin-top: 8px;
 }
 .age-tag {
-  color: var(--muted-foreground);
-  font-size: 0.9rem;
-  margin-left: 6px;
+  display: inline-block;
+  color: var(--primary);
+  background: var(--soft);
+  border-radius: 999px;
+  padding: 1px 11px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin-left: 8px;
   white-space: nowrap;
+}
+.age-tag.deceased {
+  color: #6b7280;
+  background: rgba(120, 125, 140, 0.18);
 }
 .family-table {
   width: 100%;
@@ -510,42 +695,60 @@ button:disabled {
 .family-table th,
 .family-table td {
   text-align: left;
-  padding: 8px 6px;
-  border-bottom: 1px solid var(--border);
+  padding: 10px 8px;
+  border-bottom: 1px dashed var(--border);
 }
 .family-table th {
-  color: var(--muted-foreground);
+  color: var(--muted);
   font-weight: 500;
 }
 
 @media (max-width: 480px) {
+  :root {
+    --pad: 16px;
+  }
+  .row {
+    grid-template-columns: 100px 1fr;
+  }
+  .brand {
+    font-size: 1rem;
+  }
+  .navbtn,
+  a.navbtn {
+    padding: 6px 11px;
+    font-size: 0.85rem;
+  }
+  .banner .wrap {
+    border-radius: 24px;
+  }
   .child-fields {
     grid-template-columns: 1fr;
   }
+  .profile-head {
+    gap: 12px;
+  }
 }
 
-/* ===== คำนำหน้า/สถานะ/ต้นไม้ครอบครัว ===== */
-a.navbtn {
-  display: inline-block;
-  text-decoration: none;
-  font-size: inherit;
-}
-.age-tag.deceased {
-  color: var(--destructive, #b3261e);
-}
-.wrap.wide {
-  max-width: 1100px;
-}
+/* ===== ต้นไม้ครอบครัว: กระดานมืดมีจุด การ์ดไล่สี ===== */
 .tree-canvas {
   width: 100%;
-  height: 70vh;
-  min-height: 420px;
-  margin-top: 12px;
+  height: 72vh;
+  min-height: 440px;
+  margin-top: 14px;
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: 20px;
   overflow: hidden;
-  background-color: rgb(33, 33, 33);
   color: #fff;
+  background-color: #17142e;
+  background-image:
+    radial-gradient(rgba(255, 255, 255, 0.09) 1px, transparent 1px),
+    radial-gradient(circle at 15% 0%, #3a2f7a, transparent 55%),
+    radial-gradient(circle at 100% 100%, #5a2a62, transparent 50%);
+  background-size:
+    24px 24px,
+    auto,
+    auto;
+  box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.35);
 }
 .tree-canvas svg {
   display: block;
@@ -557,36 +760,55 @@ a.navbtn {
 }
 .tree-canvas .edge {
   fill: none;
-  stroke: #6f7a8c;
-  stroke-width: 1.25;
+  stroke: rgba(255, 255, 255, 0.32);
+  stroke-width: 1.6;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
 .tree-canvas .edge.spouse {
-  stroke: #d4a72c;
-  stroke-width: 2;
+  stroke: #ffd166;
+  stroke-width: 2.6;
+  filter: drop-shadow(0 0 4px rgba(255, 209, 102, 0.7));
 }
 .tree-canvas .node {
   cursor: pointer;
+  animation: fadeIn 0.6s both;
+  filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.35));
+  transition: filter 0.2s;
+}
+.tree-canvas .node:hover {
+  filter: drop-shadow(0 8px 16px rgba(255, 255, 255, 0.25)) brightness(1.1);
+}
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 .tree-canvas .card-bg {
-  stroke: transparent;
-  stroke-width: 2;
+  stroke: rgba(255, 255, 255, 0.35);
+  stroke-width: 1;
 }
 .tree-canvas .card-bg.male {
-  fill: #4f7485;
+  fill: url(#g-male);
 }
 .tree-canvas .card-bg.female {
-  fill: #a8646d;
+  fill: url(#g-female);
 }
 .tree-canvas .card-bg.unknown {
-  fill: #5a6170;
+  fill: url(#g-unknown);
 }
 .tree-canvas .card-bg.deceased {
-  fill: #7a7f88;
+  fill: url(#g-deceased);
 }
 .tree-canvas .node.selected .card-bg {
   stroke: #fff;
+  stroke-width: 3;
+}
+.tree-canvas .node.selected {
+  filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.7));
 }
 .tree-canvas .tree-card {
   display: flex;
@@ -594,18 +816,20 @@ a.navbtn {
   gap: 8px;
   box-sizing: border-box;
   height: 100%;
-  padding: 6px 8px;
+  padding: 6px 10px;
   color: #fff;
   font-size: 13px;
+  font-weight: 500;
   line-height: 1.25;
 }
 .tree-canvas .tree-avatar {
-  width: 40px;
-  height: 40px;
+  width: 42px;
+  height: 42px;
   flex: none;
   border-radius: 50%;
   object-fit: cover;
   background: #eef1f7;
+  border: 2px solid rgba(255, 255, 255, 0.85);
 }
 .tree-canvas .tree-card span {
   display: -webkit-box;
@@ -613,4 +837,13 @@ a.navbtn {
   -webkit-box-orient: vertical;
   overflow: hidden;
   overflow-wrap: anywhere;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
 }
