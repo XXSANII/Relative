@@ -72,6 +72,7 @@ function buildTreeData({ people = [], child_links = [] }) {
         age: p.age ?? null,
         deceased: !!p.deceased,
         canOpen: p.can_open !== false,
+        isMember: p.is_member !== false,
       },
       rels: {
         parents: arr(parents, id),

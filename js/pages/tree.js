@@ -179,7 +179,11 @@
     const render = (animate, mode) => {
       const key = viewAll ? "all" : current;
       if (shownKey !== key) {
-        draw(viewAll ? connected : relatedItems(connected, current));
+        draw(
+          viewAll
+            ? connected.filter((d) => d.data.isMember) // ดูทั้งหมด = เฉพาะสมาชิกหลักของตระกูลนี้
+            : relatedItems(connected, current),
+        );
         shownKey = key;
       }
       info.textContent = viewAll
@@ -190,16 +194,21 @@
     };
     render(false);
 
-    viewAllBtn.addEventListener("click", () => {
-      viewAll = !viewAll;
+    const setViewAll = (v) => {
+      viewAll = v;
       viewAllBtn.setAttribute("aria-pressed", String(viewAll));
       viewAllBtn.textContent = viewAll ? "🎯 ดูเฉพาะที่เกี่ยวข้อง" : "🌐 ดูทั้งหมด";
+    };
+    viewAllBtn.addEventListener("click", () => {
+      setViewAll(!viewAll);
       render(true, viewAll ? "fit" : undefined);
     });
 
     // ค้นหาจากชื่อหรือชื่อเล่น แสดงผลลัพธ์เฉพาะเมื่อพิมพ์ (เหมือนหน้า Home)
     // โหมดเฉพาะที่เกี่ยวข้อง: วาดใหม่เฉพาะคนที่เกี่ยวข้อง / โหมดดูทั้งหมด: คงภาพรวมแล้วชี้ตำแหน่งคนนั้น
     const pick = (id) => {
+      // คนนอกตระกูล (ผู้เชื่อมโยง) ไม่อยู่ในโหมดดูทั้งหมด จึงสลับกลับเป็นโหมดเฉพาะที่เกี่ยวข้องให้
+      if (viewAll && !byId.get(id).data.isMember) setViewAll(false);
       current = id;
       search.value = byId.get(id).data.name;
       results.innerHTML = "";
