@@ -132,43 +132,58 @@ function computeTreeLayout(items) {
     });
   }
 
+  // เส้นเชื่อมแบบ "สายสกุล": ทุกคู่ที่มีลูกจะมีเส้นแนวตั้งหนึ่งเส้นลงมาจากจุดกึ่งกลางคู่
+  // แล้วแตกเป็นเส้นนอนและเส้นย่อยไปหาลูกแต่ละคน ลดการไขว้ของเส้นเมื่อครอบครัวใหญ่
   const edges = [];
-  // เส้นพ่อแม่ → ลูก (โค้งแนวดิ่ง)
-  for (const d of items) {
-    const child = pos.get(d.id);
-    for (const p of d.rels.parents || []) {
-      const parent = pos.get(p);
-      if (!parent) continue;
-      const x1 = parent.x + CARD_W / 2,
-        y1 = parent.y + CARD_H,
-        x2 = child.x + CARD_W / 2,
-        y2 = child.y,
-        my = (y1 + y2) / 2;
-      edges.push({
-        type: "parent",
-        d: `M${x1},${y1} C${x1},${my} ${x2},${my} ${x2},${y2}`,
-      });
+  const busGap = ROW_GAP / 2;
+  const cx = (n) => n.x + CARD_W / 2;
+  for (const u of units) {
+    const parents = u.members.map((m) => pos.get(m.id)).filter(Boolean);
+    const kids = new Map();
+    for (const m of u.members) {
+      for (const c of m.rels.children || []) {
+        const child = pos.get(c);
+        if (child) kids.set(c, child);
+      }
     }
+    if (!parents.length || !kids.size) continue;
+    const sorted = [...kids.values()].sort((a, b) => a.x - b.x);
+    const px = (Math.min(...parents.map(cx)) + Math.max(...parents.map(cx))) / 2;
+    const py = parents[0].y + CARD_H;
+    const busY = py + busGap;
+    const lo = Math.min(px, cx(sorted[0]));
+    const hi = Math.max(px, cx(sorted[sorted.length - 1]));
+    let d = `M${px},${py} V${busY} M${lo},${busY} H${hi}`;
+    for (const c of sorted) d += ` M${cx(c)},${busY} V${c.y}`;
+    edges.push({ type: "parent", d });
   }
-  // เส้นคู่สมรส: โค้งเหนือการ์ดสองใบ (ไม่ตัดผ่านคนอื่นในแถว)
-  const seen = new Set();
-  for (const d of items) {
-    for (const s of d.rels.spouses || []) {
-      const key = [d.id, s].sort().join("|");
-      if (seen.has(key) || !pos.has(s)) continue;
-      seen.add(key);
-      const a = pos.get(d.id),
-        b = pos.get(s),
-        left = a.x <= b.x ? a : b,
-        right = left === a ? b : a,
-        x1 = left.x + CARD_W / 2,
-        x2 = right.x + CARD_W / 2,
-        y = Math.min(left.y, right.y),
-        lift = 28 + Math.min(120, Math.abs(x2 - x1) / 6);
-      edges.push({
-        type: "spouse",
-        d: `M${x1},${y} C${x1},${y - lift} ${x2},${y - lift} ${x2},${y}`,
-      });
+
+  // เส้นคู่สมรส: คู่ที่ติดกันเป็นเส้นนอนสั้นระหว่างการ์ด คู่ที่ห่างกันเป็นโค้งเหนือแถว
+  for (const u of units) {
+    const ms = u.members
+      .map((m) => pos.get(m.id))
+      .filter(Boolean)
+      .sort((a, b) => a.x - b.x);
+    for (let i = 1; i < ms.length; i++) {
+      const left = ms[i - 1],
+        right = ms[i];
+      const gap = right.x - (left.x + CARD_W);
+      if (gap <= GAP_X + 1) {
+        const y = left.y + CARD_H / 2;
+        edges.push({
+          type: "spouse",
+          d: `M${left.x + CARD_W},${y} H${right.x}`,
+        });
+      } else {
+        const x1 = cx(left),
+          x2 = cx(right),
+          y = Math.min(left.y, right.y),
+          lift = 28 + Math.min(120, Math.abs(x2 - x1) / 6);
+        edges.push({
+          type: "spouse",
+          d: `M${x1},${y} C${x1},${y - lift} ${x2},${y - lift} ${x2},${y}`,
+        });
+      }
     }
   }
 
