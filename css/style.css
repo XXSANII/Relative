@@ -1064,13 +1064,21 @@ dialog::backdrop {
   border-radius: 18px;
   background: var(--soft);
 }
+/* หัวข้อเป็นส่วนหนึ่งของกล่อง (ไม่คร่อมเส้นขอบ) */
 .form-section legend {
+  float: left;
+  width: 100%;
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 0 8px;
+  padding: 14px 0 10px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid var(--border);
   font-size: 1.05rem;
   font-weight: 650;
+}
+.form-section legend + * {
+  clear: both;
 }
 .form-section .step {
   display: inline-grid;
