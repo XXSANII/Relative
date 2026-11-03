@@ -206,11 +206,11 @@
           "บัญชีถูกสร้างแล้ว แต่ยังไม่มี session กรุณาปิด Confirm email ใน Supabase Auth หรือใช้ flow ยืนยันบัญชีที่ตั้งค่าไว้",
         );
 
-      // ตรวจชื่อซ้ำผ่านฟังก์ชัน เพราะผู้สมัครใหม่ยังไม่มีวงครอบครัวจึงอ่านรายชื่อโดยตรงไม่ได้ (11-family-circles.sql)
+      // ตรวจชื่อซ้ำ (ชื่อเดียวกันแต่บิดา/มารดาต่างกัน ถือเป็นคนละคน: 27-name-taken-by-parents.sql) ผ่านฟังก์ชัน เพราะผู้สมัครใหม่ยังไม่มีวงครอบครัวจึงอ่านรายชื่อโดยตรงไม่ได้ (11-family-circles.sql)
       // Never link by name alone.
       const { data: nameTaken, error: matchError } = await sb.rpc(
         "person_name_taken",
-        { p_name: name },
+        { p_name: name, p_father: father_name, p_mother: mother_name },
       );
       if (matchError) throw matchError;
       let personId = null;
