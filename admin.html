@@ -68,7 +68,7 @@
         <h2 id="editTitle">แก้ไขข้อมูล</h2>
         <p class="hint">
           ชื่อจริงใช้เป็น Username ของเจ้าของบัญชี ถ้าแก้ชื่อ เขาต้องเข้าสู่ระบบด้วยชื่อใหม่
-          วันเกิดที่ใส่ใหม่ไม่เปลี่ยนรหัสผ่านของเขา
+          การแก้วันเกิดไม่เปลี่ยนรหัสผ่านของเขา
         </p>
         <div class="form-grid">
           <label for="f_prefix">คำนำหน้า</label><input id="f_prefix" maxlength="20" />
@@ -81,17 +81,24 @@
             <option value="female">หญิง</option>
             <option value="other">อื่น ๆ</option>
           </select>
-          <label for="f_birth_date">วันเกิด (ค.ศ.) ใส่เมื่อต้องการแก้เท่านั้น</label>
-          <input id="f_birth_date" type="date" />
+          <div id="f_birthBox"></div>
           <label class="check" for="f_deceased"
             ><input type="checkbox" id="f_deceased" /><span>เสียชีวิตแล้ว</span></label
           >
           <div id="fullFields">
           <label for="f_phone">เบอร์โทร</label><input id="f_phone" type="tel" maxlength="20" />
           <label for="f_line_id">LINE ID</label><input id="f_line_id" maxlength="20" />
-          <label for="f_father_name">ชื่อบิดา</label><input id="f_father_name" />
-          <label for="f_mother_name">ชื่อมารดา</label><input id="f_mother_name" />
-          <label for="f_spouse_name">ชื่อคู่สมรส</label><input id="f_spouse_name" />
+          <label for="f_father_name">ชื่อบิดา</label><input id="f_father_name" list="peopleList" />
+          <div id="f_fatherAliveBox"></div>
+          <div id="f_fatherBirthBox" class="switch-box"></div>
+          <label for="f_mother_name">ชื่อมารดา</label><input id="f_mother_name" list="peopleList" />
+          <div id="f_motherAliveBox"></div>
+          <div id="f_motherBirthBox" class="switch-box"></div>
+          <label for="f_spouse_name">ชื่อคู่สมรส</label><input id="f_spouse_name" list="peopleList" />
+          <label for="f_spouse_phone">เบอร์ติดต่อคู่สมรส</label
+          ><input id="f_spouse_phone" type="tel" maxlength="20" placeholder="เช่น 0812345678" />
+          <datalist id="peopleList"></datalist>
+          <div id="f_childrenBox"></div>
           <label for="f_house_no">บ้านเลขที่</label><input id="f_house_no" />
           <label for="f_road">ถนน</label><input id="f_road" />
           <label for="f_subdistrict">ตำบล/แขวง</label><input id="f_subdistrict" />
@@ -126,6 +133,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/config.js"></script>
     <script src="js/shared/common.js"></script>
+    <script src="js/shared/family.js"></script>
     <script src="js/pages/admin.js"></script>
   </body>
 </html>

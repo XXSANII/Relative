@@ -304,9 +304,28 @@
     "district", "province", "postal_code",
   ];
   let original = null,
-    isBasic = false;
+    isBasic = false,
+    widgets = null;
+  const initWidgets = () => {
+    if (widgets) return;
+    widgets = {
+      birth: birthDateInput("f_birthBox", { label: "วันเดือนปีเกิด" }),
+      fatherBirth: optionalBirthDate("f_fatherBirthBox", {
+        toggleLabel: "วันเดือนปีเกิดของบิดา",
+        label: "วันเกิดของบิดา",
+      }),
+      motherBirth: optionalBirthDate("f_motherBirthBox", {
+        toggleLabel: "วันเดือนปีเกิดของมารดา",
+        label: "วันเกิดของมารดา",
+      }),
+      fatherAlive: aliveSwitch("f_fatherAliveBox", "บิดา"),
+      motherAlive: aliveSwitch("f_motherAliveBox", "มารดา"),
+      kids: childrenEditor("f_childrenBox"),
+    };
+  };
   const openEdit = async (id, name) => {
     const data = await call("clan_get_person", { p_person_id: id });
+    initWidgets();
     target = id;
     original = data;
     $("editTitle").textContent = `แก้ไขข้อมูล: ${name}`;
@@ -316,11 +335,20 @@
     // ผู้เชื่อมโยง (basic) แก้ได้เฉพาะข้อมูลพื้นฐาน ซ่อนช่องที่เหลือ
     isBasic = data.level === "basic";
     $("fullFields").hidden = isBasic;
-    $("f_birth_date").value = "";
+    widgets.birth.set(data.birth_date);
+    if (!isBasic) {
+      widgets.fatherBirth.set(data.father_birth_date);
+      widgets.motherBirth.set(data.mother_birth_date);
+      widgets.fatherAlive.set(data.father_alive);
+      widgets.motherAlive.set(data.mother_alive);
+      $("f_spouse_phone").value = data.spouse_phone ?? "";
+      widgets.kids.set(data.children || []);
+    }
     showMessage("editMessage", "");
     $("editDialog").showModal();
   };
   $("editCancel").addEventListener("click", () => $("editDialog").close());
+  const fail = (msg) => showMessage("editMessage", msg);
   $("editForm").addEventListener("submit", async (e) => {
     e.preventDefault();
     const patch = {};
@@ -330,11 +358,43 @@
     }
     if ($("f_deceased").checked !== !!original.deceased)
       patch.deceased = $("f_deceased").checked;
-    if ($("f_birth_date").value) patch.birth_date = $("f_birth_date").value;
-    if ("full_name" in patch && !patch.full_name) {
-      showMessage("editMessage", "ชื่อ-นามสกุลต้องไม่ว่าง");
-      return;
+    if ("full_name" in patch && !patch.full_name) return fail("ชื่อ-นามสกุลต้องไม่ว่าง");
+
+    // ช่องวันเกิดที่แก้ได้ทั้งสองระดับ (ผู้เชื่อมโยงอ่านวันเกิดเดิมไม่ได้ จึงส่งเฉพาะเมื่อกรอก)
+    const birth = widgets.birth.get();
+    if (birth.error) return fail(birth.error);
+    if (isBasic ? birth.value : birth.value !== (original.birth_date ?? null))
+      patch.birth_date = birth.value ?? "";
+
+    if (!isBasic) {
+      for (const [key, w] of [
+        ["father_birth_date", widgets.fatherBirth],
+        ["mother_birth_date", widgets.motherBirth],
+      ]) {
+        const r = w.get();
+        if (r.error) return fail(r.error);
+        if (r.value !== (original[key] ?? null)) patch[key] = r.value ?? "";
+      }
+      const fAlive = widgets.fatherAlive.get(!!$("f_father_name").value.trim()),
+        mAlive = widgets.motherAlive.get(!!$("f_mother_name").value.trim());
+      if (fAlive !== null && fAlive !== (original.father_alive ?? null)) patch.father_alive = fAlive;
+      if (mAlive !== null && mAlive !== (original.mother_alive ?? null)) patch.mother_alive = mAlive;
+
+      const sp = readSpousePhone("f_spouse_phone");
+      if (sp.error) return fail(sp.error);
+      if (sp.value !== (original.spouse_phone ?? null)) patch.spouse_phone = sp.value ?? "";
+
+      const kids = widgets.kids.get();
+      if (kids.error) return fail(kids.error);
+      const shape = (c) => [c.id ?? null, c.relation, c.name, c.birth_date ?? null];
+      const before = JSON.stringify((original.children || []).map(shape)),
+        after = JSON.stringify(kids.children.map(shape));
+      if (before !== after || kids.removedIds.length) {
+        patch.children = kids.children.map((c) => ({ ...c, birth_date: c.birth_date ?? "" }));
+        patch.removed_children = kids.removedIds;
+      }
     }
+
     if (!Object.keys(patch).length) {
       $("editDialog").close();
       return;
@@ -346,7 +406,7 @@
       await refresh();
       say("บันทึกข้อมูลแล้ว", "success");
     } catch (err) {
-      showMessage("editMessage", err.message);
+      fail(err.message);
     } finally {
       $("editSave").disabled = false;
     }
