@@ -193,7 +193,7 @@
       $("view").hidden = false;
       showMessage("message", "");
     };
-    $("e_avatar").onchange = () => {
+    $("e_avatar").onchange = async () => {
       const f = $("e_avatar").files[0];
       if (!f) {
         $("e_preview").hidden = true;
@@ -210,12 +210,17 @@
         );
         return;
       }
+      const cropped = await cropIntoInput($("e_avatar"), f);
+      if (!cropped) {
+        $("e_preview").hidden = true;
+        return;
+      }
       const r = new FileReader();
       r.onload = () => {
         $("e_preview").src = r.result;
         $("e_preview").hidden = false;
       };
-      r.readAsDataURL(f);
+      r.readAsDataURL(cropped);
     };
     $("editForm").onsubmit = async (e) => {
       e.preventDefault();

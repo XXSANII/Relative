@@ -579,6 +579,30 @@ button:disabled {
   box-shadow: var(--shadow-sm);
 }
 
+/* ===== ครอปรูปโปรไฟล์ ===== */
+.crop-dialog {
+  width: min(360px, calc(100% - 28px));
+  text-align: center;
+}
+.crop-canvas {
+  display: block;
+  width: 100%;
+  max-width: 300px;
+  aspect-ratio: 1;
+  margin: 12px auto;
+  border-radius: 14px;
+  cursor: grab;
+  touch-action: none;
+  background: #eee;
+}
+.crop-canvas:active {
+  cursor: grabbing;
+}
+.crop-zoom {
+  width: 100%;
+  max-width: 300px;
+}
+
 /* ===== วันเกิด / สวิตช์ / บุตรธิดา ===== */
 .date-row {
   display: grid;

@@ -73,7 +73,7 @@
     }
   };
 
-  $("avatar").addEventListener("change", () => {
+  $("avatar").addEventListener("change", async () => {
     const f = $("avatar").files[0];
     if (!f) {
       $("preview").hidden = true;
@@ -88,12 +88,17 @@
       $("preview").hidden = true;
       return;
     }
+    const cropped = await cropIntoInput($("avatar"), f);
+    if (!cropped) {
+      $("preview").hidden = true;
+      return;
+    }
     const r = new FileReader();
     r.onload = () => {
       $("preview").src = r.result;
       $("preview").hidden = false;
     };
-    r.readAsDataURL(f);
+    r.readAsDataURL(cropped);
   });
 
   let pendingClaim = false;
