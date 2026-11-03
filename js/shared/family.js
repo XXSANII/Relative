@@ -132,7 +132,7 @@ function optionalBirthDate(boxId, { toggleLabel, label }) {
 function childrenEditor(boxId) {
   const box = $(boxId),
     sw = boxId + "_on";
-  box.innerHTML = `<h3 class="subhead">บุตร/ธิดา</h3>${switchHtml(sw, "วันเดือนปีเกิดของบุตร/ธิดา")}<p class="hint" hidden></p>
+  box.innerHTML = `<h3 class="subhead">บุตร/ธิดา (ไม่ต้องใส่ คำนำหน้า)</h3>${switchHtml(sw, "วันเดือนปีเกิดของบุตร/ธิดา")}<p class="hint" hidden></p>
     <div class="child-list"></div><button type="button" class="ghost add-child">+ เพิ่มบุตร/ธิดา</button>
     <p class="hint">กรอกชื่อ-นามสกุลให้ตรงกับในระบบ หน้าโปรไฟล์จะกดเข้าไปดูข้อมูลได้ ถ้ายังไม่ได้ลงทะเบียน ระบบจะเชื่อมให้เมื่อลงทะเบียน</p>`;
   const list = box.querySelector(".child-list"),
