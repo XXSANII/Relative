@@ -78,6 +78,7 @@
                 main
                   ? `<button data-act="edit" class="ghost">แก้ไข</button>
                      <button data-act="move" class="ghost">ย้าย</button>
+                     <button data-act="demote" class="ghost">ลดเป็นผู้เชื่อมโยง</button>
                      ${m.has_account ? `<button data-act="${m.is_admin ? "unadmin" : "admin"}" class="ghost">${m.is_admin ? "ถอดผู้ดูแล" : "ตั้งเป็นผู้ดูแล"}</button>` : ""}
                      <button data-act="remove" class="danger">เอาออก</button>`
                   : `<button data-act="edit" class="ghost">แก้ไข</button>
@@ -169,6 +170,9 @@
       } else if (act === "unlink") {
         if (!confirm(`เอา ${name} ออกจากผู้เชื่อมโยงของตระกูล ${clanName(clanId)}?\n(ความสัมพันธ์ในข้อมูลของเขาไม่เปลี่ยน แค่ไม่แสดงในตระกูลนี้)`)) return;
         await call("clan_remove_linked", { p_clan_id: clanId, p_person_id: id });
+      } else if (act === "demote") {
+        if (!confirm(`ลด ${name} เป็นผู้เชื่อมโยงของตระกูล ${clanName(clanId)}?\n(ถ้าเขาเป็นผู้ดูแล จะถูกถอดสิทธิ์ผู้ดูแลด้วย เลื่อนกลับเป็นสมาชิกหลักได้ภายหลัง)`)) return;
+        await call("clan_demote_member", { p_clan_id: clanId, p_person_id: id });
       } else if (act === "promote") {
         await call("clan_add_member", { p_clan_id: clanId, p_person_id: id });
       }
