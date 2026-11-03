@@ -1005,3 +1005,8 @@ dialog::backdrop {
   stroke: rgba(255, 255, 255, 0.7);
   opacity: 0.85;
 }
+
+/* หน้า Home: ไม่แสดงไอคอนต้นไม้ในแถบบน */
+.page-main .banner .wrap::before {
+  display: none;
+}
