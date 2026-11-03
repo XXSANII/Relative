@@ -135,8 +135,8 @@ function computeTreeLayout(items) {
   // เส้นเชื่อมแบบ "สายสกุล": ทุกคู่ที่มีลูกจะมีเส้นแนวตั้งหนึ่งเส้นลงมาจากจุดกึ่งกลางคู่
   // แล้วแตกเป็นเส้นนอนและเส้นย่อยไปหาลูกแต่ละคน ลดการไขว้ของเส้นเมื่อครอบครัวใหญ่
   const edges = [];
-  const busGap = ROW_GAP / 2;
   const cx = (n) => n.x + CARD_W / 2;
+  const buses = [];
   for (const u of units) {
     const parents = u.members.map((m) => pos.get(m.id)).filter(Boolean);
     const kids = new Map();
@@ -150,12 +150,36 @@ function computeTreeLayout(items) {
     const sorted = [...kids.values()].sort((a, b) => a.x - b.x);
     const px = (Math.min(...parents.map(cx)) + Math.max(...parents.map(cx))) / 2;
     const py = parents[0].y + CARD_H;
-    const busY = py + busGap;
     const lo = Math.min(px, cx(sorted[0]));
     const hi = Math.max(px, cx(sorted[sorted.length - 1]));
-    let d = `M${px},${py} V${busY} M${lo},${busY} H${hi}`;
-    for (const c of sorted) d += ` M${cx(c)},${busY} V${c.y}`;
-    edges.push({ type: "parent", d });
+    buses.push({ px, py, lo, hi, sorted });
+  }
+  // ครอบครัวที่เส้นนอนทับ/ชิดกันในรุ่นเดียวกันจะดูเป็นเส้นเดียว จึงแยกเป็นหลายระดับความสูง
+  // (ครอบครัวที่ซ้อนกันทางขวาอยู่ตื้นกว่า เพื่อไม่ให้เส้นตั้งของคนละครอบครัวต่อกันเป็นเส้นตรง)
+  const LANE_GAP = 16,
+    LANE_PAD = 24;
+  const byRow = new Map();
+  for (const b of buses) {
+    if (!byRow.has(b.py)) byRow.set(b.py, []);
+    byRow.get(b.py).push(b);
+  }
+  for (const [py, list] of byRow) {
+    list.sort((a, b) => a.lo - b.lo);
+    const laneEnds = [];
+    for (const b of list) {
+      let lane = laneEnds.findIndex((end) => b.lo > end + LANE_PAD);
+      if (lane < 0) lane = laneEnds.length;
+      laneEnds[lane] = b.hi;
+      b.lane = lane;
+    }
+    const lanes = laneEnds.length;
+    const top = py + (ROW_GAP - (lanes - 1) * LANE_GAP) / 2;
+    for (const b of list) {
+      const busY = top + (lanes - 1 - b.lane) * LANE_GAP;
+      let d = `M${b.px},${py} V${busY} M${b.lo},${busY} H${b.hi}`;
+      for (const c of b.sorted) d += ` M${cx(c)},${busY} V${c.y}`;
+      edges.push({ type: "parent", d });
+    }
   }
 
   // เส้นคู่สมรส: คู่ที่ติดกันเป็นเส้นนอนสั้นระหว่างการ์ด คู่ที่ห่างกันเป็นโค้งเหนือแถว
