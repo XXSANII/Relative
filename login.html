@@ -21,14 +21,13 @@
         ><button id="homeBtn" class="navbtn">หน้า Home</button>
       </div>
     </header>
-    <main class="wrap">
-      <section class="card card--hero">
-        <h1>เข้าสู่ระบบ</h1>
-        <p class="muted">
-          Username คือชื่อจริง (ไม่ต้องใส่นามสกุล) และ Password
-          คือวันเดือนปีเกิดแบบ DDMMYYYY ปี พ.ศ. (เช่น 22032547)
-          บัญชีที่สมัครก่อนเปลี่ยนระบบยังใช้เบอร์โทรศัพท์ได้
-        </p>
+    <main class="wrap narrow">
+      <section class="card auth-card">
+        <div class="auth-head">
+          <div class="auth-icon" aria-hidden="true">🌳</div>
+          <h1>เข้าสู่ระบบ</h1>
+          <p class="muted">ยินดีต้อนรับสู่ทะเบียนเครือญาติ</p>
+        </div>
         <div id="message" hidden></div>
         <form id="loginForm">
           <label for="username">Username (ชื่อจริง)</label
@@ -37,19 +36,25 @@
             required
             autocomplete="username"
             placeholder="เช่น สมชาย"
-          /><label for="password">Password (วันเดือนปีเกิด DDMMYYYY)</label
+          />
+          <p class="hint muted">ใช้ชื่อจริงอย่างเดียว ไม่ต้องใส่นามสกุล</p>
+          <label for="password">Password (วันเดือนปีเกิด)</label
           ><input
             id="password"
             type="password"
             inputmode="numeric"
             required
             autocomplete="current-password"
-            placeholder="เช่น 22032547"
-          /><button id="submitBtn" type="submit">เข้าสู่ระบบ</button>
+            placeholder="DDMMYYYY เช่น 22032547"
+          />
+          <p class="hint muted">
+            รูปแบบ DDMMYYYY ปี พ.ศ. · บัญชีที่สมัครก่อนเปลี่ยนระบบยังใช้เบอร์โทรศัพท์ได้
+          </p>
+          <button id="submitBtn" type="submit">เข้าสู่ระบบ</button>
         </form>
-        <p class="muted">
+        <div class="auth-foot">
           ยังไม่มีบัญชี? <a href="register.html">ลงทะเบียน</a>
-        </p>
+        </div>
       </section>
     </main>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>

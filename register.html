@@ -25,129 +25,172 @@
       </div>
     </header>
     <main class="wrap">
-      <section class="card card--hero">
+      <section class="card">
         <h1>สร้างบัญชี / ลงทะเบียน</h1>
         <p class="muted">
           ชื่อจริงใช้เป็น Username และวันเดือนปีเกิดใช้เป็น Password
           สำหรับเข้าสู่ระบบ (รูปแบบ DDMMYYYY ปี พ.ศ. เช่น เกิด 22 มีนาคม 2547 →
-          22032547)
+          22032547) · ช่องที่มี <span class="req">*</span> จำเป็นต้องกรอก
         </p>
         <div id="message" hidden></div>
         <form id="registerForm">
-          <label for="prefix">คำนำหน้า</label
-          ><input
-            id="prefix"
-            list="prefixList"
-            maxlength="20"
-            autocomplete="honorific-prefix"
-            placeholder="เช่น นาย นาง นางสาว"
-          /><datalist id="prefixList">
-            <option value="นาย"></option>
-            <option value="นาง"></option>
-            <option value="นางสาว"></option>
-            <option value="ด.ช."></option>
-            <option value="ด.ญ."></option>
-            <option value="ดร."></option>
-            <option value="ศ."></option>
-            <option value="รศ."></option>
-            <option value="ผศ."></option>
-          </datalist>
-          <label for="firstName">ชื่อจริง (Username) *</label
-          ><input
-            id="firstName"
-            required
-            autocomplete="given-name"
-            maxlength="60"
-          /><label for="lastName">นามสกุล *</label
-          ><input
-            id="lastName"
-            required
-            autocomplete="family-name"
-            maxlength="60"
-          />
-          <p class="hint">
-            ระบบจะจัดคุณเข้าตระกูลตามนามสกุลให้อัตโนมัติ
-            และถ้านามสกุลของบิดา/มารดาไม่ตรงกับของคุณ
-            คุณจะเป็นสมาชิกหลักของตระกูลบิดา/มารดาด้วย
-          </p>
-          <label for="nickname">ชื่อเล่น</label
-          ><input id="nickname" maxlength="40" autocomplete="nickname" />
-          <label class="check" for="deceased"
-            ><input type="checkbox" id="deceased" /><span
-              >เสียชีวิตแล้ว (ไม่ต้องกรอกวันเดือนปีเกิด)</span
-            ></label
-          >
-          <div id="birthBox"></div>
-          <p class="hint">
-            <strong
-              >หากไม่ได้กรอกวันเดือนปีเกิด ให้ใช้รหัสผ่าน 00000000
-              ในการเข้าสู่ระบบ</strong
+          <fieldset class="form-section">
+            <legend><span class="step">1</span>ข้อมูลส่วนตัว</legend>
+            <div class="grid-3">
+              <div>
+                <label for="prefix">คำนำหน้า</label
+                ><input
+                  id="prefix"
+                  list="prefixList"
+                  maxlength="20"
+                  autocomplete="honorific-prefix"
+                  placeholder="นาย / นาง"
+                />
+                <datalist id="prefixList">
+                  <option value="นาย"></option>
+                  <option value="นาง"></option>
+                  <option value="นางสาว"></option>
+                  <option value="ด.ช."></option>
+                  <option value="ด.ญ."></option>
+                  <option value="ดร."></option>
+                  <option value="ศ."></option>
+                  <option value="รศ."></option>
+                  <option value="ผศ."></option>
+                </datalist>
+              </div>
+              <div>
+                <label for="firstName">ชื่อจริง (Username) <span class="req">*</span></label
+                ><input
+                  id="firstName"
+                  required
+                  autocomplete="given-name"
+                  maxlength="60"
+                />
+              </div>
+              <div>
+                <label for="lastName">นามสกุล <span class="req">*</span></label
+                ><input
+                  id="lastName"
+                  required
+                  autocomplete="family-name"
+                  maxlength="60"
+                />
+              </div>
+            </div>
+            <p class="hint muted">
+              ระบบจะจัดคุณเข้าตระกูลตามนามสกุลให้อัตโนมัติ
+              และถ้านามสกุลของบิดา/มารดาไม่ตรงกับของคุณ
+              คุณจะเป็นสมาชิกหลักของตระกูลบิดา/มารดาด้วย
+            </p>
+            <div class="grid-2">
+              <div>
+                <label for="nickname">ชื่อเล่น</label
+                ><input id="nickname" maxlength="40" autocomplete="nickname" />
+              </div>
+              <div>
+                <label for="gender">เพศ</label
+                ><select id="gender">
+                  <option value="">ไม่ระบุ</option>
+                  <option value="male">ชาย</option>
+                  <option value="female">หญิง</option>
+                  <option value="other">อื่น ๆ</option>
+                </select>
+              </div>
+            </div>
+            <label class="check" for="deceased"
+              ><input type="checkbox" id="deceased" /><span
+                >เสียชีวิตแล้ว (ไม่ต้องกรอกวันเดือนปีเกิด)</span
+              ></label
             >
-          </p>
-          <label for="phone">เบอร์โทรศัพท์ (ไม่บังคับ)</label
-          ><input
-            id="phone"
-            type="tel"
-            autocomplete="tel"
-            placeholder="เช่น 0812345678"
-            maxlength="20"
-          /><label for="gender">เพศ</label
-          ><select id="gender">
-            <option value="">ไม่ระบุ</option>
-            <option value="male">ชาย</option>
-            <option value="female">หญิง</option>
-            <option value="other">อื่น ๆ</option>
-          </select>
-          <div id="addressBox"></div>
-          <label for="father">ชื่อ-นามสกุลบิดา (ไม่ต้องใส่ คำนำหน้า)</label
-          ><input id="father" maxlength="120" />
-          <div id="fatherAliveBox"></div>
-          <div id="fatherBirthBox" class="switch-box"></div>
-          <label for="mother">ชื่อ-นามสกุลมารดา (ไม่ต้องใส่ คำนำหน้า)</label
-          ><input id="mother" maxlength="120" />
-          <div id="motherAliveBox"></div>
-          <div id="motherBirthBox" class="switch-box"></div>
-          <label for="spouse">ชื่อ-นามสกุลคู่สมรส (ถ้ามี)</label
-          ><input id="spouse" maxlength="120" /><label for="spousePhone"
-            >เบอร์ติดต่อคู่สมรส (ถ้ามี)</label
-          ><input
-            id="spousePhone"
-            type="tel"
-            autocomplete="off"
-            placeholder="เช่น 0812345678"
-            maxlength="20"
-          />
-          <p class="hint">เบอร์คู่สมรสแสดงให้เฉพาะเจ้าของข้อมูลเท่านั้น</p>
-          <p class="hint">
-            ถ้าพ่อ แม่ หรือคู่สมรสยังไม่ได้ลงทะเบียน
-            ระบบจะเชื่อมให้อัตโนมัติเมื่อท่านลงทะเบียนด้วยชื่อ-นามสกุลเดียวกัน
-            แก้ไขภายหลังได้ที่หน้าโปรไฟล์
-          </p>
-          <div id="childrenBox"></div>
-          <label for="claimCode">รหัสยืนยัน (กรณีมีข้อมูลบุคคลเดิมในระบบ)</label
-          ><input
-            id="claimCode"
-            autocomplete="off"
-            placeholder="กรอก Claim Code ถ้ามี"
-          />
-          <p class="hint">
-            หากมีชื่ออยู่ในทะเบียนแล้ว
-            ต้องใช้รหัสยืนยันจากผู้ดูแลเพื่อเชื่อมบัญชีเดิม หากยังไม่มีข้อมูล
-            ระบบจะสร้างข้อมูลใหม่ให้
-          </p>
-          <label for="avatar">รูปโปรไฟล์ (ไม่บังคับ)</label
-          ><input
-            id="avatar"
-            type="file"
-            accept="image/jpeg,image/png,image/webp"
-          /><img id="preview" class="preview" alt="ตัวอย่างรูป" hidden /><button
-            id="submitBtn"
-            type="submit"
-          >
-            ลงทะเบียนและเข้า Home
-          </button>
+            <div id="birthBox"></div>
+            <p class="hint note">
+              <strong
+                >หากไม่ได้กรอกวันเดือนปีเกิด ให้ใช้รหัสผ่าน 00000000
+                ในการเข้าสู่ระบบ</strong
+              >
+            </p>
+          </fieldset>
+
+          <fieldset class="form-section">
+            <legend><span class="step">2</span>การติดต่อและที่อยู่</legend>
+            <label for="phone">เบอร์โทรศัพท์ (ไม่บังคับ)</label
+            ><input
+              id="phone"
+              type="tel"
+              autocomplete="tel"
+              placeholder="เช่น 0812345678"
+              maxlength="20"
+            />
+            <div id="addressBox"></div>
+          </fieldset>
+
+          <fieldset class="form-section">
+            <legend><span class="step">3</span>ครอบครัว</legend>
+            <p class="hint muted">
+              ถ้าพ่อ แม่ หรือคู่สมรสยังไม่ได้ลงทะเบียน
+              ระบบจะเชื่อมให้อัตโนมัติเมื่อท่านลงทะเบียนด้วยชื่อ-นามสกุลเดียวกัน
+              แก้ไขภายหลังได้ที่หน้าโปรไฟล์
+            </p>
+            <div class="family-block">
+              <label for="father">ชื่อ-นามสกุลบิดา (ไม่ต้องใส่ คำนำหน้า)</label
+              ><input id="father" maxlength="120" />
+              <div id="fatherAliveBox"></div>
+              <div id="fatherBirthBox" class="switch-box"></div>
+            </div>
+            <div class="family-block">
+              <label for="mother">ชื่อ-นามสกุลมารดา (ไม่ต้องใส่ คำนำหน้า)</label
+              ><input id="mother" maxlength="120" />
+              <div id="motherAliveBox"></div>
+              <div id="motherBirthBox" class="switch-box"></div>
+            </div>
+            <div class="family-block">
+              <div class="grid-2">
+                <div>
+                  <label for="spouse">ชื่อ-นามสกุลคู่สมรส (ถ้ามี)</label
+                  ><input id="spouse" maxlength="120" />
+                </div>
+                <div>
+                  <label for="spousePhone">เบอร์ติดต่อคู่สมรส (ถ้ามี)</label
+                  ><input
+                    id="spousePhone"
+                    type="tel"
+                    autocomplete="off"
+                    placeholder="เช่น 0812345678"
+                    maxlength="20"
+                  />
+                </div>
+              </div>
+              <p class="hint muted">เบอร์คู่สมรสแสดงให้เฉพาะเจ้าของข้อมูลเท่านั้น</p>
+            </div>
+            <div id="childrenBox"></div>
+          </fieldset>
+
+          <fieldset class="form-section">
+            <legend><span class="step">4</span>ยืนยันตัวตนและรูปโปรไฟล์</legend>
+            <label for="claimCode">รหัสยืนยัน (กรณีมีข้อมูลบุคคลเดิมในระบบ)</label
+            ><input
+              id="claimCode"
+              autocomplete="off"
+              placeholder="กรอก Claim Code ถ้ามี"
+            />
+            <p class="hint muted">
+              หากมีชื่ออยู่ในทะเบียนแล้ว
+              ต้องใช้รหัสยืนยันจากผู้ดูแลเพื่อเชื่อมบัญชีเดิม หากยังไม่มีข้อมูล
+              ระบบจะสร้างข้อมูลใหม่ให้
+            </p>
+            <label for="avatar">รูปโปรไฟล์ (ไม่บังคับ)</label
+            ><input
+              id="avatar"
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+            /><img id="preview" class="preview" alt="ตัวอย่างรูป" hidden />
+          </fieldset>
+
+          <button id="submitBtn" type="submit">ลงทะเบียนและเข้า Home</button>
         </form>
-        <p class="muted">มีบัญชีแล้ว? <a href="login.html">เข้าสู่ระบบ</a></p>
+        <div class="auth-foot">
+          มีบัญชีแล้ว? <a href="login.html">เข้าสู่ระบบ</a>
+        </div>
       </section>
     </main>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>

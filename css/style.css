@@ -1010,3 +1010,112 @@ dialog::backdrop {
 .page-main .banner .wrap::before {
   display: none;
 }
+
+/* ===== หน้า Login / Register: จัดโครงสร้างใหม่ ===== */
+.wrap.narrow {
+  width: min(440px, 100% - 28px);
+}
+.auth-card {
+  margin-top: 8px;
+}
+.auth-head {
+  text-align: center;
+  margin-bottom: 8px;
+}
+.auth-head h1 {
+  margin-bottom: 2px;
+}
+.auth-head .muted {
+  margin: 0;
+}
+.auth-icon {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 10px;
+  border-radius: 20px;
+  background: var(--soft);
+  font-size: 2rem;
+}
+.auth-foot {
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+.auth-card .hint,
+.form-section .hint {
+  margin: 6px 0 0;
+}
+.req {
+  color: var(--danger);
+  font-weight: 700;
+}
+
+/* แบ่งฟอร์มสมัครเป็นกลุ่ม ๆ */
+.form-section {
+  min-width: 0;
+  margin: 18px 0 0;
+  padding: 4px 16px 16px;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: var(--soft);
+}
+.form-section legend {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 8px;
+  font-size: 1.05rem;
+  font-weight: 650;
+}
+.form-section .step {
+  display: inline-grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), var(--primary-2));
+  color: #fff;
+  font-size: 0.85rem;
+}
+.grid-2,
+.grid-3 {
+  display: grid;
+  gap: 0 12px;
+}
+.grid-2 {
+  grid-template-columns: 1fr 1fr;
+}
+.grid-3 {
+  grid-template-columns: 0.8fr 1.1fr 1.1fr;
+}
+.grid-2 > div,
+.grid-3 > div {
+  min-width: 0;
+}
+.family-block {
+  margin-top: 14px;
+  padding: 2px 14px 12px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--card-solid);
+}
+.hint.note {
+  padding: 8px 12px;
+  border-radius: 12px;
+  background: var(--card-solid);
+  border: 1px dashed var(--border);
+}
+@media (max-width: 560px) {
+  .grid-2,
+  .grid-3 {
+    grid-template-columns: 1fr;
+  }
+  .form-section {
+    padding: 2px 12px 14px;
+  }
+}
