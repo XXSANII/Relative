@@ -70,6 +70,7 @@ function buildTreeData({ people = [], child_links = [] }) {
         nickname: p.nickname || "",
         avatar: p.avatar_path ? avatarUrl(p.avatar_path) : "",
         age: p.age ?? null,
+        rank: p.sort_rank ?? null, // ลำดับอายุจากฐานข้อมูล (1 = มากสุด) ใช้เรียงป้าย
         deceased: !!p.deceased,
         canOpen: p.can_open !== false,
         isMember: p.is_member !== false,

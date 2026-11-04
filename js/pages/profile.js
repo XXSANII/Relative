@@ -34,6 +34,8 @@
       { p_person_id: person.id },
     );
     if (infoError) throw infoError;
+    // ผู้เสียชีวิตไม่แสดงอายุ (ป้ายในแผนภาพเรียงตามวันเกิดอยู่แล้ว)
+    $("ageRow").hidden = !!person.deceased;
     $("age").textContent = ageText(info?.age);
     $("deceasedRow").hidden = !person.deceased;
     // มี id = ลงทะเบียนแล้ว กดเข้าไปดูได้ / มีแต่ชื่อ = ยังไม่ได้ลงทะเบียน แสดงเป็นข้อความ
@@ -98,7 +100,7 @@
         ? `<button class="relation" data-person="${c.person_id}">${esc(displayName(c))}</button>`
         : `<span class="pending">${esc(c.name)}<small>(ยังไม่ได้ลงทะเบียน)</small></span>`;
     $("children").innerHTML = kidsInfo.length
-      ? `<table class="family-table"><thead><tr><th>ความสัมพันธ์</th><th>ชื่อ</th><th>อายุ</th></tr></thead><tbody>${kidsInfo.map((c) => `<tr><td>${esc(CHILD_RELATION[c.relation] || "-")}</td><td>${childName(c)}</td><td>${esc(ageText(c.age))}</td></tr>`).join("")}</tbody></table>`
+      ? `<table class="family-table"><thead><tr><th>ความสัมพันธ์</th><th>ชื่อ</th><th>อายุ</th></tr></thead><tbody>${kidsInfo.map((c) => `<tr><td>${esc(CHILD_RELATION[c.relation] || "-")}</td><td>${childName(c)}</td><td>${c.deceased ? '<span class="age-tag deceased">เสียชีวิต</span>' : esc(ageText(c.age))}</td></tr>`).join("")}</tbody></table>`
       : '<p class="muted">-</p>';
     document
       .querySelectorAll("[data-person]")

@@ -11,13 +11,15 @@ const CARD_W = 200,
   MARGIN = 40;
 
 // เรียงอายุมาก → น้อย; ไม่มีวันเกิดอยู่ท้าย; อายุเท่ากันเรียงตามชื่อ
+// ใช้ rank จากฐานข้อมูล (เรียงตามวันเกิดจริง รวมผู้เสียชีวิต) ถ้าไม่มีจึงใช้อายุเต็มปี
+const ageKey = (d) => d.rank ?? (d.age == null ? null : -d.age);
 function compareByAge(a, b) {
-  const x = a.data.age,
-    y = b.data.age;
+  const x = ageKey(a.data),
+    y = ageKey(b.data);
   if (x == null && y == null) return a.data.name.localeCompare(b.data.name, "th");
   if (x == null) return 1;
   if (y == null) return -1;
-  return y - x || a.data.name.localeCompare(b.data.name, "th");
+  return x - y || a.data.name.localeCompare(b.data.name, "th");
 }
 
 // หารุ่นของทุกคน: วนซ้ำจนนิ่ง (จำกัดรอบเพื่อกันข้อมูลวนลูป)
